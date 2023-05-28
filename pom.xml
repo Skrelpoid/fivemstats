@@ -12,6 +12,7 @@
 		<java.version>17</java.version>
 		<vaadin.version>24.0.5</vaadin.version>
 		<selenium.version>4.8.3</selenium.version>
+		<jersey.version>3.1.2</jersey.version>
 	</properties>
 
 	<parent>
@@ -61,6 +62,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>

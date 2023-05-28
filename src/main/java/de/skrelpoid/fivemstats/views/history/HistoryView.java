@@ -1,5 +1,11 @@
 package de.skrelpoid.fivemstats.views.history;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -32,29 +38,25 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 
 @PageTitle("History")
-@Route(value = "History", layout = MainLayout.class)
+@Route(value = "history", layout = MainLayout.class)
 @PermitAll
 @Uses(Icon.class)
 public class HistoryView extends Div {
 
     private Grid<SamplePerson> grid;
 
-    private Filters filters;
+    private final Filters filters;
     private final SamplePersonService samplePersonService;
 
-    public HistoryView(SamplePersonService SamplePersonService) {
+    public HistoryView(final SamplePersonService SamplePersonService) {
         this.samplePersonService = SamplePersonService;
         setSizeFull();
         addClassNames("history-view");
 
-        filters = new Filters(() -> refreshGrid());
-        VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
+        filters = new Filters(this::refreshGrid);
+        final VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
@@ -63,14 +65,14 @@ public class HistoryView extends Div {
 
     private HorizontalLayout createMobileFilters() {
         // Mobile version
-        HorizontalLayout mobileFilters = new HorizontalLayout();
+        final HorizontalLayout mobileFilters = new HorizontalLayout();
         mobileFilters.setWidthFull();
         mobileFilters.addClassNames(LumoUtility.Padding.MEDIUM, LumoUtility.BoxSizing.BORDER,
                 LumoUtility.AlignItems.CENTER);
         mobileFilters.addClassName("mobile-filters");
 
-        Icon mobileIcon = new Icon("lumo", "plus");
-        Span filtersHeading = new Span("Filters");
+        final Icon mobileIcon = new Icon("lumo", "plus");
+        final Span filtersHeading = new Span("Filters");
         mobileFilters.add(mobileIcon, filtersHeading);
         mobileFilters.setFlexGrow(1, filtersHeading);
         mobileFilters.addClickListener(e -> {
@@ -94,7 +96,7 @@ public class HistoryView extends Div {
         private final MultiSelectComboBox<String> occupations = new MultiSelectComboBox<>("Occupation");
         private final CheckboxGroup<String> roles = new CheckboxGroup<>("Role");
 
-        public Filters(Runnable onSearch) {
+        public Filters(final Runnable onSearch) {
 
             setWidthFull();
             addClassName("filter-layout");
@@ -108,7 +110,7 @@ public class HistoryView extends Div {
             roles.addClassName("double-width");
 
             // Action buttons
-            Button resetBtn = new Button("Reset");
+            final Button resetBtn = new Button("Reset");
             resetBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             resetBtn.addClickListener(e -> {
                 name.clear();
@@ -119,11 +121,11 @@ public class HistoryView extends Div {
                 roles.clear();
                 onSearch.run();
             });
-            Button searchBtn = new Button("Search");
+            final Button searchBtn = new Button("Search");
             searchBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             searchBtn.addClickListener(e -> onSearch.run());
 
-            Div actions = new Div(resetBtn, searchBtn);
+            final Div actions = new Div(resetBtn, searchBtn);
             actions.addClassName(LumoUtility.Gap.SMALL);
             actions.addClassName("actions");
 
@@ -139,65 +141,65 @@ public class HistoryView extends Div {
             setAriaLabel(startDate, "From date");
             setAriaLabel(endDate, "To date");
 
-            FlexLayout dateRangeComponent = new FlexLayout(startDate, new Text(" – "), endDate);
+            final FlexLayout dateRangeComponent = new FlexLayout(startDate, new Text(" – "), endDate);
             dateRangeComponent.setAlignItems(FlexComponent.Alignment.BASELINE);
             dateRangeComponent.addClassName(LumoUtility.Gap.XSMALL);
 
             return dateRangeComponent;
         }
 
-        private void setAriaLabel(DatePicker datePicker, String label) {
+        private void setAriaLabel(final DatePicker datePicker, final String label) {
             datePicker.getElement().executeJs("const input = this.inputElement;" //
                     + "input.setAttribute('aria-label', $0);" //
                     + "input.removeAttribute('aria-labelledby');", label);
         }
 
         @Override
-        public Predicate toPredicate(Root<SamplePerson> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-            List<Predicate> predicates = new ArrayList<>();
+        public Predicate toPredicate(final Root<SamplePerson> root, final CriteriaQuery<?> query, final CriteriaBuilder criteriaBuilder) {
+            final List<Predicate> predicates = new ArrayList<>();
 
             if (!name.isEmpty()) {
-                String lowerCaseFilter = name.getValue().toLowerCase();
-                Predicate firstNameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")),
+                final String lowerCaseFilter = name.getValue().toLowerCase();
+                final Predicate firstNameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")),
                         lowerCaseFilter + "%");
-                Predicate lastNameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")),
+                final Predicate lastNameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")),
                         lowerCaseFilter + "%");
                 predicates.add(criteriaBuilder.or(firstNameMatch, lastNameMatch));
             }
             if (!phone.isEmpty()) {
-                String databaseColumn = "phone";
-                String ignore = "- ()";
+                final String databaseColumn = "phone";
+                final String ignore = "- ()";
 
-                String lowerCaseFilter = ignoreCharacters(ignore, phone.getValue().toLowerCase());
-                Predicate phoneMatch = criteriaBuilder.like(
+                final String lowerCaseFilter = ignoreCharacters(ignore, phone.getValue().toLowerCase());
+                final Predicate phoneMatch = criteriaBuilder.like(
                         ignoreCharacters(ignore, criteriaBuilder, criteriaBuilder.lower(root.get(databaseColumn))),
                         "%" + lowerCaseFilter + "%");
                 predicates.add(phoneMatch);
 
             }
             if (startDate.getValue() != null) {
-                String databaseColumn = "dateOfBirth";
+                final String databaseColumn = "dateOfBirth";
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(databaseColumn),
                         criteriaBuilder.literal(startDate.getValue())));
             }
             if (endDate.getValue() != null) {
-                String databaseColumn = "dateOfBirth";
+                final String databaseColumn = "dateOfBirth";
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(criteriaBuilder.literal(endDate.getValue()),
                         root.get(databaseColumn)));
             }
             if (!occupations.isEmpty()) {
-                String databaseColumn = "occupation";
-                List<Predicate> occupationPredicates = new ArrayList<>();
-                for (String occupation : occupations.getValue()) {
+                final String databaseColumn = "occupation";
+                final List<Predicate> occupationPredicates = new ArrayList<>();
+                for (final String occupation : occupations.getValue()) {
                     occupationPredicates
                             .add(criteriaBuilder.equal(criteriaBuilder.literal(occupation), root.get(databaseColumn)));
                 }
                 predicates.add(criteriaBuilder.or(occupationPredicates.toArray(Predicate[]::new)));
             }
             if (!roles.isEmpty()) {
-                String databaseColumn = "role";
-                List<Predicate> rolePredicates = new ArrayList<>();
-                for (String role : roles.getValue()) {
+                final String databaseColumn = "role";
+                final List<Predicate> rolePredicates = new ArrayList<>();
+                for (final String role : roles.getValue()) {
                     rolePredicates.add(criteriaBuilder.equal(criteriaBuilder.literal(role), root.get(databaseColumn)));
                 }
                 predicates.add(criteriaBuilder.or(rolePredicates.toArray(Predicate[]::new)));
@@ -205,7 +207,7 @@ public class HistoryView extends Div {
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
         }
 
-        private String ignoreCharacters(String characters, String in) {
+        private String ignoreCharacters(final String characters, final String in) {
             String result = in;
             for (int i = 0; i < characters.length(); i++) {
                 result = result.replace("" + characters.charAt(i), "");
@@ -213,8 +215,8 @@ public class HistoryView extends Div {
             return result;
         }
 
-        private Expression<String> ignoreCharacters(String characters, CriteriaBuilder criteriaBuilder,
-                Expression<String> inExpression) {
+        private Expression<String> ignoreCharacters(final String characters, final CriteriaBuilder criteriaBuilder,
+                final Expression<String> inExpression) {
             Expression<String> expression = inExpression;
             for (int i = 0; i < characters.length(); i++) {
                 expression = criteriaBuilder.function("replace", String.class, expression,

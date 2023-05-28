@@ -25,13 +25,17 @@ public class Player implements Serializable {
 	@Column
 	private Long discordId;
 
+	@Column
 	private Long steamId;
 	@Column(length = 40)
 	private String license;
 	@Column(length = 40)
 	private String license2;
+	@Column
 	private Long xboxLiveId;
+	@Column
 	private Long liveId;
+	@Column
 	private Long fivemId;
 
 	@Column(length = 100)
@@ -44,6 +48,8 @@ public class Player implements Serializable {
 	private String alias2;
 	@Column(length = 128)
 	private String alias3;
+	@Column
+	private Long longTermSecondsLogged;
 
 	@JsonProperty("identifiers")
 	private void unpackNameFromNestedObject(final List<String> identifiers) {
