@@ -1,4 +1,4 @@
-package de.skrelpoid.views.login;
+package de.skrelpoid.fivemstats.views.login;
 
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
@@ -9,7 +9,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.internal.RouteUtil;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.skrelpoid.security.AuthenticatedUser;
+
+import de.skrelpoid.fivemstats.security.AuthenticatedUser;
 
 @AnonymousAllowed
 @PageTitle("Login")

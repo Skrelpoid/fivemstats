@@ -1,4 +1,4 @@
-package de.skrelpoid.views.dashboard;
+package de.skrelpoid.fivemstats.views.dashboard;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -8,7 +8,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import de.skrelpoid.views.MainLayout;
+
+import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 
 @PageTitle("Dashboard")

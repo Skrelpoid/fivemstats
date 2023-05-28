@@ -1,8 +1,10 @@
-package de.skrelpoid.security;
+package de.skrelpoid.fivemstats.security;
 
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import de.skrelpoid.data.entity.User;
-import de.skrelpoid.data.service.UserRepository;
+
+import de.skrelpoid.fivemstats.data.entity.User;
+import de.skrelpoid.fivemstats.data.service.UserRepository;
+
 import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;

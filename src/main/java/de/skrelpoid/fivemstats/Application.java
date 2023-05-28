@@ -1,9 +1,11 @@
-package de.skrelpoid;
+package de.skrelpoid.fivemstats;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-import de.skrelpoid.data.service.SamplePersonRepository;
+
+import de.skrelpoid.fivemstats.data.service.SamplePersonRepository;
+
 import javax.sql.DataSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package de.skrelpoid.views;
+package de.skrelpoid.fivemstats.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -18,14 +18,15 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import de.skrelpoid.data.entity.User;
 import de.skrelpoid.fivemstats.components.appnav.AppNav;
 import de.skrelpoid.fivemstats.components.appnav.AppNavItem;
-import de.skrelpoid.security.AuthenticatedUser;
-import de.skrelpoid.views.dashboard.DashboardView;
-import de.skrelpoid.views.history.HistoryView;
-import de.skrelpoid.views.logs.LogsView;
-import de.skrelpoid.views.players.PlayersView;
+import de.skrelpoid.fivemstats.data.entity.User;
+import de.skrelpoid.fivemstats.security.AuthenticatedUser;
+import de.skrelpoid.fivemstats.views.dashboard.DashboardView;
+import de.skrelpoid.fivemstats.views.history.HistoryView;
+import de.skrelpoid.fivemstats.views.logs.LogsView;
+import de.skrelpoid.fivemstats.views.players.PlayersView;
+
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 import org.vaadin.lineawesome.LineAwesomeIcon;

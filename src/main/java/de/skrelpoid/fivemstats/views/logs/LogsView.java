@@ -1,4 +1,4 @@
-package de.skrelpoid.views.logs;
+package de.skrelpoid.fivemstats.views.logs;
 
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -7,7 +7,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import de.skrelpoid.views.MainLayout;
+
+import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Logs")

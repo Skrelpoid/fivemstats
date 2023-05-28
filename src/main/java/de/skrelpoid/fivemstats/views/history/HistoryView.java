@@ -1,4 +1,4 @@
-package de.skrelpoid.views.history;
+package de.skrelpoid.fivemstats.views.history;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -22,9 +22,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import de.skrelpoid.data.entity.SamplePerson;
-import de.skrelpoid.data.service.SamplePersonService;
-import de.skrelpoid.views.MainLayout;
+
+import de.skrelpoid.fivemstats.data.entity.SamplePerson;
+import de.skrelpoid.fivemstats.data.service.SamplePersonService;
+import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

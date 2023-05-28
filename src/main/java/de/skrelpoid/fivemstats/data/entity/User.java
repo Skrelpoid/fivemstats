@@ -1,4 +1,4 @@
-package de.skrelpoid.data.entity;
+package de.skrelpoid.fivemstats.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

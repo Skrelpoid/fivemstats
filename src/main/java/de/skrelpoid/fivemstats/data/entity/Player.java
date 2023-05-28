@@ -1,4 +1,4 @@
-package de.skrelpoid.data.entity;
+package de.skrelpoid.fivemstats.data.entity;
 
 import java.io.Serializable;
 import java.util.List;

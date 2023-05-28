@@ -1,4 +1,4 @@
-package de.skrelpoid.views.players;
+package de.skrelpoid.fivemstats.views.players;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -25,9 +25,10 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import de.skrelpoid.data.entity.SamplePerson;
-import de.skrelpoid.data.service.SamplePersonService;
-import de.skrelpoid.views.MainLayout;
+
+import de.skrelpoid.fivemstats.data.entity.SamplePerson;
+import de.skrelpoid.fivemstats.data.service.SamplePersonService;
+import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 import java.util.Optional;
 import org.springframework.data.domain.PageRequest;

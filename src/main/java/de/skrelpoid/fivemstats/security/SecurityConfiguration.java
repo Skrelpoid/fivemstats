@@ -1,7 +1,9 @@
-package de.skrelpoid.security;
+package de.skrelpoid.fivemstats.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import de.skrelpoid.views.login.LoginView;
+
+import de.skrelpoid.fivemstats.views.login.LoginView;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

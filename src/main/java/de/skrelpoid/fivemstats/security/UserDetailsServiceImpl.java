@@ -1,7 +1,5 @@
-package de.skrelpoid.security;
+package de.skrelpoid.fivemstats.security;
 
-import de.skrelpoid.data.entity.User;
-import de.skrelpoid.data.service.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import de.skrelpoid.fivemstats.data.entity.User;
+import de.skrelpoid.fivemstats.data.service.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
