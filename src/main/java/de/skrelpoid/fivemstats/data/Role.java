@@ -1,4 +1,4 @@
-package de.skrelpoid.data;
+package de.skrelpoid.fivemstats.data;
 
 public enum Role {
     USER, ADMIN;

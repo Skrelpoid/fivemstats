@@ -1,7 +1,8 @@
 package de.skrelpoid.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.skrelpoid.data.Role;
+
+import de.skrelpoid.fivemstats.data.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;

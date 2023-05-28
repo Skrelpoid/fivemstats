@@ -17,9 +17,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import de.skrelpoid.components.appnav.AppNav;
-import de.skrelpoid.components.appnav.AppNavItem;
+
 import de.skrelpoid.data.entity.User;
+import de.skrelpoid.fivemstats.components.appnav.AppNav;
+import de.skrelpoid.fivemstats.components.appnav.AppNavItem;
 import de.skrelpoid.security.AuthenticatedUser;
 import de.skrelpoid.views.dashboard.DashboardView;
 import de.skrelpoid.views.history.HistoryView;

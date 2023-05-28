@@ -1,4 +1,4 @@
-package de.skrelpoid.components.appnav;
+package de.skrelpoid.fivemstats.components.appnav;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
