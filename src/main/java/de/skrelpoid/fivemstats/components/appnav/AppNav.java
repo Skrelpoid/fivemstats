@@ -1,5 +1,7 @@
 package de.skrelpoid.fivemstats.components.appnav;
 
+import java.util.Optional;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
@@ -7,7 +9,6 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.dom.Element;
-import java.util.Optional;
 
 /**
  * A navigation menu with support for hierarchical and flat menus.
@@ -21,10 +22,13 @@ import java.util.Optional;
 @NpmPackage(value = "@vaadin-component-factory/vcf-nav", version = "1.0.6")
 public class AppNav extends Component implements HasSize, HasStyle {
 
-    /**
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a new menu without any label.
      */
     public AppNav() {
+    	// Empty
     }
 
     /**
@@ -33,7 +37,7 @@ public class AppNav extends Component implements HasSize, HasStyle {
      * @param label
      *            the label to use
      */
-    public AppNav(String label) {
+    public AppNav(final String label) {
         setLabel(label);
     }
 
@@ -44,8 +48,8 @@ public class AppNav extends Component implements HasSize, HasStyle {
      *            the menu item(s) to add
      * @return the menu for chaining
      */
-    public AppNav addItem(AppNavItem... appNavItems) {
-        for (AppNavItem appNavItem : appNavItems) {
+    public AppNav addItem(final AppNavItem... appNavItems) {
+        for (final AppNavItem appNavItem : appNavItems) {
             getElement().appendChild(appNavItem.getElement());
         }
 
@@ -61,8 +65,8 @@ public class AppNav extends Component implements HasSize, HasStyle {
      *            the menu item to remove
      * @return the menu for chaining
      */
-    public AppNav removeItem(AppNavItem appNavItem) {
-        Optional<Component> parent = appNavItem.getParent();
+    public AppNav removeItem(final AppNavItem appNavItem) {
+        final Optional<Component> parent = appNavItem.getParent();
         if (parent.isPresent() && parent.get() == this) {
             getElement().removeChild(appNavItem.getElement());
         }
@@ -86,7 +90,7 @@ public class AppNav extends Component implements HasSize, HasStyle {
      * @return the label or null if no label has been set
      */
     public String getLabel() {
-        return getExistingLabelElement().map(e -> e.getText()).orElse(null);
+        return getExistingLabelElement().map(Element::getText).orElse(null);
     }
 
     /**
@@ -99,7 +103,7 @@ public class AppNav extends Component implements HasSize, HasStyle {
      *            the label to set
      * @return this instance for chaining
      */
-    public AppNav setLabel(String label) {
+    public AppNav setLabel(final String label) {
         getLabelElement().setText(label);
         return this;
     }
@@ -110,7 +114,7 @@ public class AppNav extends Component implements HasSize, HasStyle {
 
     private Element getLabelElement() {
         return getExistingLabelElement().orElseGet(() -> {
-            Element element = new Element("span");
+            final Element element = new Element("span");
             element.setAttribute("slot", "label");
             getElement().appendChild(element);
             return element;
@@ -139,7 +143,7 @@ public class AppNav extends Component implements HasSize, HasStyle {
      *            otherwise
      * @return this instance for chaining
      */
-    public AppNav setCollapsible(boolean collapsible) {
+    public AppNav setCollapsible(final boolean collapsible) {
         getElement().setAttribute("collapsible", "");
         return this;
     }

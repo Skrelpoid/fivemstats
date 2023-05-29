@@ -18,15 +18,14 @@ import jakarta.annotation.security.PermitAll;
 @PermitAll
 public class DashboardView extends HorizontalLayout {
 
-    private TextField name;
-    private Button sayHello;
+	private static final long serialVersionUID = 1L;
+	private final TextField name;
+    private final Button sayHello;
 
     public DashboardView() {
         name = new TextField("Your name");
         sayHello = new Button("Say hello");
-        sayHello.addClickListener(e -> {
-            Notification.show("Hello " + name.getValue());
-        });
+        sayHello.addClickListener(e -> Notification.show("Hello " + name.getValue()));
         sayHello.addClickShortcut(Key.ENTER);
 
         setMargin(true);

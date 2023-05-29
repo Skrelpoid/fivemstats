@@ -13,6 +13,10 @@
 		<vaadin.version>24.0.5</vaadin.version>
 		<selenium.version>4.8.3</selenium.version>
 		<jersey.version>3.1.2</jersey.version>
+		<eclipse-annotation-version>2.0.0</eclipse-annotation-version>
+		<commons-collections-version>3.2.2</commons-collections-version>
+		<commons-lang-version>2.6</commons-lang-version>
+		<quartz.version>2.3.2</quartz.version>
 	</properties>
 
 	<parent>
@@ -73,7 +77,7 @@
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.annotation</artifactId>
-			<version>2.0.0</version>
+			<version>${eclipse-annotation-version}</version>
 		</dependency>
 
 		<dependency>
@@ -106,6 +110,25 @@
 			<artifactId>vaadin-testbench-junit5</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons-lang-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>${commons-collections-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${quartz.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,5 +1,10 @@
 package de.skrelpoid.fivemstats.views.players;
 
+import java.util.Optional;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -30,9 +35,6 @@ import de.skrelpoid.fivemstats.data.entity.SamplePerson;
 import de.skrelpoid.fivemstats.data.service.SamplePersonService;
 import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
-import java.util.Optional;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @PageTitle("Players")
 @Route(value = "players/:samplePersonID?/:action?(edit)", layout = MainLayout.class)
@@ -40,7 +42,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 @Uses(Icon.class)
 public class PlayersView extends Div implements BeforeEnterObserver {
 
-    private final String SAMPLEPERSON_ID = "samplePersonID";
+	private static final long serialVersionUID = 1L;
+	private final String SAMPLEPERSON_ID = "samplePersonID";
     private final String SAMPLEPERSON_EDIT_ROUTE_TEMPLATE = "players/%s/edit";
 
     private final Grid<SamplePerson> grid = new Grid<>(SamplePerson.class, false);
@@ -63,12 +66,12 @@ public class PlayersView extends Div implements BeforeEnterObserver {
 
     private final SamplePersonService samplePersonService;
 
-    public PlayersView(SamplePersonService samplePersonService) {
+    public PlayersView(final SamplePersonService samplePersonService) {
         this.samplePersonService = samplePersonService;
         addClassNames("players-view");
 
         // Create UI
-        SplitLayout splitLayout = new SplitLayout();
+        final SplitLayout splitLayout = new SplitLayout();
 
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
@@ -83,7 +86,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         grid.addColumn("dateOfBirth").setAutoWidth(true);
         grid.addColumn("occupation").setAutoWidth(true);
         grid.addColumn("role").setAutoWidth(true);
-        LitRenderer<SamplePerson> importantRenderer = LitRenderer.<SamplePerson>of(
+        final LitRenderer<SamplePerson> importantRenderer = LitRenderer.<SamplePerson>of(
                 "<vaadin-icon icon='vaadin:${item.icon}' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: ${item.color};'></vaadin-icon>")
                 .withProperty("icon", important -> important.isImportant() ? "check" : "minus").withProperty("color",
                         important -> important.isImportant()
@@ -130,22 +133,22 @@ public class PlayersView extends Div implements BeforeEnterObserver {
                 refreshGrid();
                 Notification.show("Data updated");
                 UI.getCurrent().navigate(PlayersView.class);
-            } catch (ObjectOptimisticLockingFailureException exception) {
-                Notification n = Notification.show(
+            } catch (final ObjectOptimisticLockingFailureException exception) {
+                final Notification n = Notification.show(
                         "Error updating the data. Somebody else has updated the record while you were making changes.");
                 n.setPosition(Position.MIDDLE);
                 n.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            } catch (ValidationException validationException) {
+            } catch (final ValidationException validationException) {
                 Notification.show("Failed to update the data. Check again that all values are valid");
             }
         });
     }
 
     @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        Optional<Long> samplePersonId = event.getRouteParameters().get(SAMPLEPERSON_ID).map(Long::parseLong);
+    public void beforeEnter(final BeforeEnterEvent event) {
+        final Optional<Long> samplePersonId = event.getRouteParameters().get(SAMPLEPERSON_ID).map(Long::parseLong);
         if (samplePersonId.isPresent()) {
-            Optional<SamplePerson> samplePersonFromBackend = samplePersonService.get(samplePersonId.get());
+            final Optional<SamplePerson> samplePersonFromBackend = samplePersonService.get(samplePersonId.get());
             if (samplePersonFromBackend.isPresent()) {
                 populateForm(samplePersonFromBackend.get());
             } else {
@@ -160,15 +163,15 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         }
     }
 
-    private void createEditorLayout(SplitLayout splitLayout) {
-        Div editorLayoutDiv = new Div();
+    private void createEditorLayout(final SplitLayout splitLayout) {
+        final Div editorLayoutDiv = new Div();
         editorLayoutDiv.setClassName("editor-layout");
 
-        Div editorDiv = new Div();
+        final Div editorDiv = new Div();
         editorDiv.setClassName("editor");
         editorLayoutDiv.add(editorDiv);
 
-        FormLayout formLayout = new FormLayout();
+        final FormLayout formLayout = new FormLayout();
         firstName = new TextField("First Name");
         lastName = new TextField("Last Name");
         email = new TextField("Email");
@@ -185,8 +188,8 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         splitLayout.addToSecondary(editorLayoutDiv);
     }
 
-    private void createButtonLayout(Div editorLayoutDiv) {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
+    private void createButtonLayout(final Div editorLayoutDiv) {
+        final HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setClassName("button-layout");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -194,8 +197,8 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(buttonLayout);
     }
 
-    private void createGridLayout(SplitLayout splitLayout) {
-        Div wrapper = new Div();
+    private void createGridLayout(final SplitLayout splitLayout) {
+        final Div wrapper = new Div();
         wrapper.setClassName("grid-wrapper");
         splitLayout.addToPrimary(wrapper);
         wrapper.add(grid);
@@ -210,7 +213,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(SamplePerson value) {
+    private void populateForm(final SamplePerson value) {
         this.samplePerson = value;
         binder.readBean(this.samplePerson);
 

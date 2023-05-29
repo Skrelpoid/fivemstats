@@ -1,5 +1,7 @@
 package de.skrelpoid.fivemstats.components.appnav;
 
+import java.util.Optional;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -8,7 +10,6 @@ import com.vaadin.flow.internal.StateTree;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.Router;
 import com.vaadin.flow.server.VaadinService;
-import java.util.Optional;
 
 /**
  * A menu item for the {@link AppNav} component.
@@ -19,14 +20,16 @@ import java.util.Optional;
 @Tag("vcf-nav-item")
 public class AppNavItem extends Component {
 
-    /**
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a menu item which does not link to any view but only shows the given
      * label.
      * 
      * @param label
      *            the label for the item
      */
-    public AppNavItem(String label) {
+    public AppNavItem(final String label) {
         setLabel(label);
     }
 
@@ -38,7 +41,7 @@ public class AppNavItem extends Component {
      * @param path
      *            the path to link to
      */
-    public AppNavItem(String label, String path) {
+    public AppNavItem(final String label, final String path) {
         setPath(path);
         setLabel(label);
     }
@@ -51,7 +54,7 @@ public class AppNavItem extends Component {
      * @param view
      *            the view to link to
      */
-    public AppNavItem(String label, Class<? extends Component> view) {
+    public AppNavItem(final String label, final Class<? extends Component> view) {
         setPath(view);
         setLabel(label);
     }
@@ -67,7 +70,7 @@ public class AppNavItem extends Component {
      * @param icon
      *            the icon for the item
      */
-    public AppNavItem(String label, String path, Component icon) {
+    public AppNavItem(final String label, final String path, final Component icon) {
         setPath(path);
         setLabel(label);
         setIcon(icon);
@@ -83,7 +86,7 @@ public class AppNavItem extends Component {
      * @param icon
      *            the icon for the item
      */
-    public AppNavItem(String label, Class<? extends Component> view, Component icon) {
+    public AppNavItem(final String label, final Class<? extends Component> view, final Component icon) {
         setPath(view);
         setLabel(label);
         setIcon(icon);
@@ -96,8 +99,8 @@ public class AppNavItem extends Component {
      *            the menu item(s) to add
      * @return this item for chaining
      */
-    public AppNavItem addItem(AppNavItem... appNavItems) {
-        for (AppNavItem appNavItem : appNavItems) {
+    public AppNavItem addItem(final AppNavItem... appNavItems) {
+        for (final AppNavItem appNavItem : appNavItems) {
             appNavItem.getElement().setAttribute("slot", "children");
             getElement().appendChild(appNavItem.getElement());
         }
@@ -114,8 +117,8 @@ public class AppNavItem extends Component {
      *            the menu item to remove
      * @return this item for chaining
      */
-    public AppNavItem removeItem(AppNavItem appNavItem) {
-        Optional<Component> parent = appNavItem.getParent();
+    public AppNavItem removeItem(final AppNavItem appNavItem) {
+        final Optional<Component> parent = appNavItem.getParent();
         if (parent.isPresent() && parent.get() == this) {
             getElement().removeChild(appNavItem.getElement());
         }
@@ -139,7 +142,7 @@ public class AppNavItem extends Component {
      * @return the label or null if no label has been set
      */
     public String getLabel() {
-        return getExistingLabelElement().map(e -> e.getText()).orElse(null);
+        return getExistingLabelElement().map(Element::getText).orElse(null);
     }
 
     /**
@@ -151,7 +154,7 @@ public class AppNavItem extends Component {
      *            the label to set
      * @return this instance for chaining
      */
-    public AppNavItem setLabel(String label) {
+    public AppNavItem setLabel(final String label) {
         getLabelElement().setText(label);
         return this;
     }
@@ -162,7 +165,7 @@ public class AppNavItem extends Component {
 
     private Element getLabelElement() {
         return getExistingLabelElement().orElseGet(() -> {
-            Element element = Element.createText("");
+            final Element element = Element.createText("");
             getElement().appendChild(element);
             return element;
         });
@@ -175,7 +178,7 @@ public class AppNavItem extends Component {
      *            the path to link to
      * @return this instance for chaining
      */
-    public AppNavItem setPath(String path) {
+    public AppNavItem setPath(final String path) {
         getElement().setAttribute("path", path);
         return this;
     }
@@ -187,8 +190,8 @@ public class AppNavItem extends Component {
      *            the view to link to
      * @return this instance for chaining
      */
-    public AppNavItem setPath(Class<? extends Component> view) {
-        String url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
+    public AppNavItem setPath(final Class<? extends Component> view) {
+        final String url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
         setPath(url);
         return this;
     }
@@ -196,7 +199,7 @@ public class AppNavItem extends Component {
     private Router getRouter() {
         Router router = null;
         if (getElement().getNode().isAttached()) {
-            StateTree tree = (StateTree) getElement().getNode().getOwner();
+            final StateTree tree = (StateTree) getElement().getNode().getOwner();
             router = tree.getUI().getInternals().getRouter();
         }
         if (router == null) {
@@ -231,9 +234,9 @@ public class AppNavItem extends Component {
      *            the icon to show
      * @return this instance for chaining
      */
-    public AppNavItem setIcon(Component icon) {
+    public AppNavItem setIcon(final Component icon) {
         icon.getElement().setAttribute("slot", "prefix");
-        int iconElementIndex = getIconElementIndex();
+        final int iconElementIndex = getIconElementIndex();
         if (iconElementIndex != -1) {
             getElement().setChild(iconElementIndex, icon.getElement());
         } else {
@@ -248,7 +251,7 @@ public class AppNavItem extends Component {
      * @param value
      *            true to expand the item, false to collapse it
      */
-    public AppNavItem setExpanded(boolean value) {
+    public AppNavItem setExpanded(final boolean value) {
         if (value) {
             getElement().setAttribute("expanded", "");
         } else {
