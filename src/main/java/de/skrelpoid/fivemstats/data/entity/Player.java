@@ -202,4 +202,23 @@ public class Player implements Serializable {
 		return playerLogs;
 
 	}
+	
+	@Override
+    public int hashCode() {
+        if (getId() != null) {
+            return getId().hashCode();
+        }
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof final Player that)) {
+            return false; // null or not an AbstractEntity class
+        }
+        if (getId() != null) {
+            return getId().equals(that.getId());
+        }
+        return super.equals(that);
+    }
 }

@@ -9,5 +9,5 @@ public interface PlayerRepository
         extends
             JpaRepository<Player, Long>,
             JpaSpecificationExecutor<Player> {
-
+	
 }

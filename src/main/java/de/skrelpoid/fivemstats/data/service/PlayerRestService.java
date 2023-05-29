@@ -24,7 +24,7 @@ public class PlayerRestService {
 
 	private final WebTarget webTarget;
 
-	private final  ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
 	public PlayerRestService(final WebTarget webTarget, final ObjectMapper objectMapper) {
@@ -42,8 +42,9 @@ public class PlayerRestService {
 				return Arrays.asList(players);
 			} catch (final JsonProcessingException ex) {
 				logger.error("Error processing json", ex);
-			} 
-		}
+			}
+		} 
+			// TODO handle error response
 		return Collections.emptyList();
 	}
 }
