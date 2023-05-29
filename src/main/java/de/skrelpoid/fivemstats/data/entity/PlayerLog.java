@@ -5,8 +5,11 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class PlayerLog implements Serializable {
@@ -18,10 +21,14 @@ public class PlayerLog implements Serializable {
 	@GeneratedValue
 	private Long id;
 	
-	@Column
-	private LocalDateTime logInTime; // NOSONAR this should not be transient because we want it in the database
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "playerId")
+	private Player player;
 	
 	@Column
-	private LocalDateTime logOutTime; // NOSONAR this should not be transient because we want it in the database
+	private LocalDateTime logInTime; 
+	
+	@Column
+	private LocalDateTime logOutTime;
 
 }

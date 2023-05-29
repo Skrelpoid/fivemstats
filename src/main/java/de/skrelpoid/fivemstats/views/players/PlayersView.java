@@ -8,8 +8,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -24,50 +22,54 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 
-import de.skrelpoid.fivemstats.data.entity.SamplePerson;
-import de.skrelpoid.fivemstats.data.service.SamplePersonService;
+import de.skrelpoid.fivemstats.data.entity.Player;
+import de.skrelpoid.fivemstats.data.service.PlayerService;
 import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 
 @PageTitle("Players")
-@Route(value = "players/:samplePersonID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "players/:playerId?/:action?(edit)", layout = MainLayout.class)
 @PermitAll
 @Uses(Icon.class)
 public class PlayersView extends Div implements BeforeEnterObserver {
 
 	private static final long serialVersionUID = 1L;
-	private final String SAMPLEPERSON_ID = "samplePersonID";
-    private final String SAMPLEPERSON_EDIT_ROUTE_TEMPLATE = "players/%s/edit";
+	private static final String PLAYER_ID = "playerId";
+    private static final String PLAYER_EDIT_ROUTE_TEMPLATE = "players/%s/edit";
 
-    private final Grid<SamplePerson> grid = new Grid<>(SamplePerson.class, false);
+    private final Grid<Player> grid = new Grid<>(Player.class, false);
 
-    private TextField firstName;
-    private TextField lastName;
-    private TextField email;
-    private TextField phone;
-    private DatePicker dateOfBirth;
-    private TextField occupation;
-    private TextField role;
-    private Checkbox important;
+    private TextField discordId;
+    private TextField name;
+    private TextField discordIdentifier;
+    private TextField alias1;
+    private TextField alias2;
+    private TextField alias3;
+    private TextField steamId;
+    private TextField license;
+    private TextField license2;
+    private TextField xboxLiveId;
+    private TextField liveId;
+    private TextField fivemId;
+    private TextField longTermSecondsLogged;
 
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
 
-    private final BeanValidationBinder<SamplePerson> binder;
+    private final BeanValidationBinder<Player> binder;
 
-    private SamplePerson samplePerson;
+    private Player player;
 
-    private final SamplePersonService samplePersonService;
+    private final PlayerService playerService;
 
-    public PlayersView(final SamplePersonService samplePersonService) {
-        this.samplePersonService = samplePersonService;
+    public PlayersView(final PlayerService playerService) {
+        this.playerService = playerService;
         addClassNames("players-view");
 
         // Create UI
@@ -79,23 +81,21 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("firstName").setAutoWidth(true);
-        grid.addColumn("lastName").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("phone").setAutoWidth(true);
-        grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
-        grid.addColumn("role").setAutoWidth(true);
-        final LitRenderer<SamplePerson> importantRenderer = LitRenderer.<SamplePerson>of(
-                "<vaadin-icon icon='vaadin:${item.icon}' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: ${item.color};'></vaadin-icon>")
-                .withProperty("icon", important -> important.isImportant() ? "check" : "minus").withProperty("color",
-                        important -> important.isImportant()
-                                ? "var(--lumo-primary-text-color)"
-                                : "var(--lumo-disabled-text-color)");
+        grid.addColumn("discordId").setAutoWidth(true);
+        grid.addColumn("name").setAutoWidth(true);
+        grid.addColumn("discordIdentifier").setAutoWidth(true);
+        grid.addColumn("alias1").setAutoWidth(true);
+        grid.addColumn("alias2").setAutoWidth(true);
+        grid.addColumn("alias3").setAutoWidth(true);
+        grid.addColumn("steamId").setAutoWidth(true);
+        grid.addColumn("license").setAutoWidth(true);
+        grid.addColumn("license2").setAutoWidth(true);
+        grid.addColumn("xboxLiveId").setAutoWidth(true);
+        grid.addColumn("liveId").setAutoWidth(true);
+        grid.addColumn("fivemId").setAutoWidth(true);
+        grid.addColumn("longTermSecondsLogged").setAutoWidth(true);
 
-        grid.addColumn(importantRenderer).setHeader("Important").setAutoWidth(true);
-
-        grid.setItems(query -> samplePersonService.list(
+        grid.setItems(query -> playerService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -103,7 +103,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(SAMPLEPERSON_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(PLAYER_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
                 UI.getCurrent().navigate(PlayersView.class);
@@ -111,7 +111,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(SamplePerson.class);
+        binder = new BeanValidationBinder<>(Player.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -124,11 +124,11 @@ public class PlayersView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.samplePerson == null) {
-                    this.samplePerson = new SamplePerson();
+                if (this.player == null) {
+                    this.player = new Player();
                 }
-                binder.writeBean(this.samplePerson);
-                samplePersonService.update(this.samplePerson);
+                binder.writeBean(this.player);
+                playerService.update(this.player);
                 clearForm();
                 refreshGrid();
                 Notification.show("Data updated");
@@ -146,14 +146,14 @@ public class PlayersView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(final BeforeEnterEvent event) {
-        final Optional<Long> samplePersonId = event.getRouteParameters().get(SAMPLEPERSON_ID).map(Long::parseLong);
-        if (samplePersonId.isPresent()) {
-            final Optional<SamplePerson> samplePersonFromBackend = samplePersonService.get(samplePersonId.get());
-            if (samplePersonFromBackend.isPresent()) {
-                populateForm(samplePersonFromBackend.get());
+        final Optional<Long> playerId = event.getRouteParameters().get(PLAYER_ID).map(Long::parseLong);
+        if (playerId.isPresent()) {
+            final Optional<Player> playerFromBackend = playerService.get(playerId.get());
+            if (playerFromBackend.isPresent()) {
+                populateForm(playerFromBackend.get());
             } else {
                 Notification.show(
-                        String.format("The requested samplePerson was not found, ID = %s", samplePersonId.get()), 3000,
+                        String.format("The requested player was not found, ID = %s", playerId.get()), 3000,
                         Notification.Position.BOTTOM_START);
                 // when a row is selected but the data is no longer available,
                 // refresh grid
@@ -172,15 +172,42 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         final FormLayout formLayout = new FormLayout();
-        firstName = new TextField("First Name");
-        lastName = new TextField("Last Name");
-        email = new TextField("Email");
-        phone = new TextField("Phone");
-        dateOfBirth = new DatePicker("Date Of Birth");
-        occupation = new TextField("Occupation");
-        role = new TextField("Role");
-        important = new Checkbox("Important");
-        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, role, important);
+        discordId              = new TextField("Discord ID");
+        discordId.setReadOnly(true);
+        name                   = new TextField("Name");
+        name.setReadOnly(true);
+        discordIdentifier      = new TextField("Discord Identifier");
+        alias1                 = new TextField("Alias 1");
+        alias2                 = new TextField("Alias 2");
+        alias3                 = new TextField("Alias 3");
+        steamId                = new TextField("Steam ID");
+        steamId.setReadOnly(true);
+        license                = new TextField("License");
+        license.setReadOnly(true);
+        license2               = new TextField("License2");
+        license2.setReadOnly(true);
+        xboxLiveId             = new TextField("Xbox Live ID");
+        xboxLiveId.setReadOnly(true);
+        liveId                 = new TextField("Live ID");
+        liveId.setReadOnly(true);
+        fivemId                = new TextField("FiveM ID");
+        fivemId.setReadOnly(true);
+        longTermSecondsLogged  = new TextField("Total Time Logged");
+        longTermSecondsLogged.setReadOnly(true);
+        
+        formLayout.add(discordId,           
+        		name,                
+        		discordIdentifier,   
+        		alias1,              
+        		alias2,              
+        		alias3,              
+        		steamId,             
+        		license,             
+        		license2,            
+        		xboxLiveId,          
+        		liveId,              
+        		fivemId,             
+        		longTermSecondsLogged);
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
@@ -213,9 +240,9 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(final SamplePerson value) {
-        this.samplePerson = value;
-        binder.readBean(this.samplePerson);
+    private void populateForm(final Player value) {
+        this.player = value;
+        binder.readBean(this.player);
 
     }
 }

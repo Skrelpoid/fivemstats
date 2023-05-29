@@ -8,11 +8,15 @@ import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDataba
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 import de.skrelpoid.fivemstats.data.service.SamplePersonRepository;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 
 /**
  * The entry point of the Spring Boot application.
@@ -23,12 +27,12 @@ import de.skrelpoid.fivemstats.data.service.SamplePersonRepository;
  */
 @SpringBootApplication
 @Theme(value = "fivemstats", variant = Lumo.DARK)
-public class Application implements AppShellConfigurator {
+public class FiveMStatsApplication implements AppShellConfigurator {
 
 	private static final long serialVersionUID = 1L;
 
 	public static void main(final String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(FiveMStatsApplication.class, args);
     }
 
     @Bean
@@ -44,5 +48,16 @@ public class Application implements AppShellConfigurator {
                 return false;
             }
         };
+    }
+    
+    @Bean
+    WebTarget webTarget() {
+    	final Client client = ClientBuilder.newClient(); // NOSONAR close on shutdown
+    	return client.target("http://cl-rp.de:30120/players.json");
+    }
+    
+    @Bean
+    ObjectMapper objectMapper() {
+    	return new ObjectMapper();
     }
 }
