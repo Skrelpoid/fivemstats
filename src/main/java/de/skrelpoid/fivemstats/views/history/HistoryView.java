@@ -29,8 +29,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import de.skrelpoid.fivemstats.data.entity.SamplePerson;
-import de.skrelpoid.fivemstats.data.service.SamplePersonService;
+import de.skrelpoid.fivemstats.data.entity.PlayerLog;
+import de.skrelpoid.fivemstats.data.service.PlayerLogService;
 import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -44,14 +44,15 @@ import jakarta.persistence.criteria.Root;
 @PermitAll
 @Uses(Icon.class)
 public class HistoryView extends Div {
+	private static final long serialVersionUID = 1L;
 
-    private Grid<SamplePerson> grid;
+	private Grid<PlayerLog> grid;
 
     private final Filters filters;
-    private final SamplePersonService samplePersonService;
+    private final PlayerLogService playerLogService;
 
-    public HistoryView(final SamplePersonService SamplePersonService) {
-        this.samplePersonService = SamplePersonService;
+    public HistoryView(final PlayerLogService playerLogService) {
+        this.playerLogService = playerLogService;
         setSizeFull();
         addClassNames("history-view");
 
@@ -87,7 +88,7 @@ public class HistoryView extends Div {
         return mobileFilters;
     }
 
-    public static class Filters extends Div implements Specification<SamplePerson> {
+    public static class Filters extends Div implements Specification<PlayerLog> {
 
         private final TextField name = new TextField("Name");
         private final TextField phone = new TextField("Phone");
@@ -155,16 +156,22 @@ public class HistoryView extends Div {
         }
 
         @Override
-        public Predicate toPredicate(final Root<SamplePerson> root, final CriteriaQuery<?> query, final CriteriaBuilder criteriaBuilder) {
+        public Predicate toPredicate(final Root<PlayerLog> root, final CriteriaQuery<?> query, final CriteriaBuilder criteriaBuilder) {
             final List<Predicate> predicates = new ArrayList<>();
 
             if (!name.isEmpty()) {
                 final String lowerCaseFilter = name.getValue().toLowerCase();
-                final Predicate firstNameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")),
-                        lowerCaseFilter + "%");
-                final Predicate lastNameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")),
-                        lowerCaseFilter + "%");
-                predicates.add(criteriaBuilder.or(firstNameMatch, lastNameMatch));
+                final Predicate nameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("name")),
+                        "%" + lowerCaseFilter + "%");
+                final Predicate dcMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("discordIdentifier")),
+                		"%" +lowerCaseFilter + "%");
+                final Predicate alias1Match = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("alias1")),
+                		"%" +lowerCaseFilter + "%");
+                final Predicate alias2Match = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("alias2")),
+                		"%" +lowerCaseFilter + "%");
+                final Predicate alias3Match = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("alias3")),
+                		"%" +lowerCaseFilter + "%");
+                predicates.add(criteriaBuilder.or(nameMatch, dcMatch, alias1Match, alias2Match, alias3Match));
             }
             if (!phone.isEmpty()) {
                 final String databaseColumn = "phone";
@@ -228,16 +235,17 @@ public class HistoryView extends Div {
     }
 
     private Component createGrid() {
-        grid = new Grid<>(SamplePerson.class, false);
-        grid.addColumn("firstName").setAutoWidth(true);
-        grid.addColumn("lastName").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("phone").setAutoWidth(true);
-        grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
-        grid.addColumn("role").setAutoWidth(true);
+    	grid = new Grid<>(PlayerLog.class, false);
+        grid.addColumn("player.name").setAutoWidth(true);
+        grid.addColumn("player.discordId").setAutoWidth(true);
+        grid.addColumn("player.discordIdentifier").setAutoWidth(true);
+        grid.addColumn("player.alias1").setAutoWidth(true);
+        grid.addColumn("player.alias2").setAutoWidth(true);
+        grid.addColumn("player.alias3").setAutoWidth(true);
+        grid.addColumn("logInTime").setAutoWidth(true);
+        grid.addColumn("logOutTime").setAutoWidth(true);
 
-        grid.setItems(query -> samplePersonService.list(
+        grid.setItems(query -> playerLogService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
                 filters).stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);

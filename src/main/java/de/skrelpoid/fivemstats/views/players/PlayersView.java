@@ -29,6 +29,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 
 import de.skrelpoid.fivemstats.data.entity.Player;
+import de.skrelpoid.fivemstats.data.service.LongConverter;
 import de.skrelpoid.fivemstats.data.service.PlayerService;
 import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
@@ -68,7 +69,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
 
     private final PlayerService playerService;
 
-    public PlayersView(final PlayerService playerService) {
+    public PlayersView(final PlayerService playerService, final LongConverter longConverter) {
         this.playerService = playerService;
         addClassNames("players-view");
 
@@ -115,6 +116,10 @@ public class PlayersView extends Div implements BeforeEnterObserver {
 
         // Bind fields. This is where you'd define e.g. validation rules
 
+        binder.forMemberField(discordId).withConverter(longConverter);
+        binder.forMemberField(xboxLiveId).withConverter(longConverter);
+        binder.forMemberField(liveId).withConverter(longConverter);
+        binder.forMemberField(fivemId).withConverter(longConverter);
         binder.bindInstanceFields(this);
 
         cancel.addClickListener(e -> {

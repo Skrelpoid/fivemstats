@@ -46,15 +46,15 @@ public class QueryPlayerDataJob implements Job {
 		final List<Player> savedPlayers = new ArrayList<>();
 		loadOrSavePlayers(players, savedPlayers);
 		final List<PlayerLog> activeLogs = playerLogService.getActiveLogs();
+		final Set<Player> loggedIn = activeLogs.stream()
+				.map(PlayerLog::getPlayer)
+				.collect(toSet());
 		activeLogs.removeIf(log -> savedPlayers.contains(log.getPlayer()));
 		// log out all players that were not in the rest response of the server
 		for (final PlayerLog toLogOut : activeLogs) {
 			toLogOut.setLogOutTime(now);
 			playerLogService.update(toLogOut);
 		}
-		final Set<Player> loggedIn = activeLogs.stream()
-				.map(PlayerLog::getPlayer)
-				.collect(toSet());
 		// only newly logged in players remain in savedPlayers
 		savedPlayers.removeAll(loggedIn);
 		for (final Player newlyLoggedIn : savedPlayers) {
