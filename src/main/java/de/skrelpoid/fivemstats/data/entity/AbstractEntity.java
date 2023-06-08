@@ -4,16 +4,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Version;
 
 @MappedSuperclass
 public abstract class AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-    // The initial value is to account for data.sql demo data ids
-    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Version
@@ -23,7 +20,7 @@ public abstract class AbstractEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -40,8 +37,8 @@ public abstract class AbstractEntity {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractEntity that)) {
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof final AbstractEntity that)) {
             return false; // null or not an AbstractEntity class
         }
         if (getId() != null) {

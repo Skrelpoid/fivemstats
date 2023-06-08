@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<!-- Project from https://start.vaadin.com/project/8beaeacb-7a79-4684-8542-b86892d445a7 -->
+	<!-- Project from
+	https://start.vaadin.com/project/8beaeacb-7a79-4684-8542-b86892d445a7 -->
 	<groupId>de.skrelpoid</groupId>
 	<artifactId>fivemstats</artifactId>
 	<name>fivemstats</name>
@@ -12,11 +15,13 @@
 		<java.version>17</java.version>
 		<vaadin.version>24.0.5</vaadin.version>
 		<selenium.version>4.8.3</selenium.version>
-		<jersey.version>3.1.2</jersey.version>
+		<apexcharts.version>23.0.1</apexcharts.version>
+		<jersery_version>3.1.2</jersery_version>
 		<eclipse-annotation-version>2.0.0</eclipse-annotation-version>
 		<commons-collections-version>3.2.2</commons-collections-version>
 		<commons-lang-version>2.6</commons-lang-version>
 		<quartz.version>2.3.2</quartz.version>
+		<mysql.version>8.0.33</mysql.version>
 	</properties>
 
 	<parent>
@@ -70,7 +75,18 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
-			<version>${jersey.version}</version>
+			<!-- <version>${jersery_version}</version>-->
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.inject</groupId>
+			<artifactId>jersey-hk2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.appreciated</groupId>
+			<artifactId>apexcharts</artifactId>
+			<version>${apexcharts.version}</version>
 		</dependency>
 
 
@@ -81,9 +97,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.version}</version>
 		</dependency>
 
 		<dependency>
@@ -122,11 +138,11 @@
 			<artifactId>commons-collections</artifactId>
 			<version>${commons-collections-version}</version>
 		</dependency>
-		
+
 		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -143,7 +159,9 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5923</jvmArguments>
+					<jvmArguments>
+						-Xdebug
+						-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5923</jvmArguments>
 					<wait>500</wait>
 					<maxAttempts>240</maxAttempts>
 				</configuration>
@@ -225,7 +243,8 @@
 						</executions>
 					</plugin>
 
-					<!-- Runs the integration tests (*IT) after the server is started -->
+					<!-- Runs the integration tests (*IT) after the server is
+					started -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>

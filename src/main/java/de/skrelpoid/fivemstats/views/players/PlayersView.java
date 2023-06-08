@@ -9,6 +9,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -49,9 +50,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
     private TextField discordId;
     private TextField name;
     private TextField discordIdentifier;
-    private TextField alias1;
-    private TextField alias2;
-    private TextField alias3;
+    private TextField aliases;
     private TextField steamId;
     private TextField license;
     private TextField license2;
@@ -85,15 +84,13 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         grid.addColumn("discordId").setAutoWidth(true);
         grid.addColumn("name").setAutoWidth(true);
         grid.addColumn("discordIdentifier").setAutoWidth(true);
-        grid.addColumn("alias1").setAutoWidth(true);
-        grid.addColumn("alias2").setAutoWidth(true);
-        grid.addColumn("alias3").setAutoWidth(true);
-        grid.addColumn("steamId").setAutoWidth(true);
-        grid.addColumn("license").setAutoWidth(true);
-        grid.addColumn("license2").setAutoWidth(true);
-        grid.addColumn("xboxLiveId").setAutoWidth(true);
-        grid.addColumn("liveId").setAutoWidth(true);
-        grid.addColumn("fivemId").setAutoWidth(true);
+        grid.addColumn("aliases").setAutoWidth(true);
+        grid.addColumn("steamId").setAutoWidth(true).setVisible(false);
+        grid.addColumn("license").setAutoWidth(true).setVisible(false);
+        grid.addColumn("license2").setAutoWidth(true).setVisible(false);
+        grid.addColumn("xboxLiveId").setAutoWidth(true).setVisible(false);
+        grid.addColumn("liveId").setAutoWidth(true).setVisible(false);
+        grid.addColumn("fivemId").setAutoWidth(true).setVisible(false);
         grid.addColumn("longTermSecondsLogged").setAutoWidth(true);
 
         grid.setItems(query -> playerService.list(
@@ -182,9 +179,7 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         name                   = new TextField("Name");
         name.setReadOnly(true);
         discordIdentifier      = new TextField("Discord Identifier");
-        alias1                 = new TextField("Alias 1");
-        alias2                 = new TextField("Alias 2");
-        alias3                 = new TextField("Alias 3");
+        aliases                 = new TextField("Aliases");
         steamId                = new TextField("Steam ID");
         steamId.setReadOnly(true);
         license                = new TextField("License");
@@ -200,18 +195,20 @@ public class PlayersView extends Div implements BeforeEnterObserver {
         longTermSecondsLogged  = new TextField("Total Time Logged");
         longTermSecondsLogged.setReadOnly(true);
         
-        formLayout.add(discordId,           
-        		name,                
-        		discordIdentifier,   
-        		alias1,              
-        		alias2,              
-        		alias3,              
-        		steamId,             
+        
+        final FormLayout identifiers = new FormLayout();
+        identifiers.add(steamId,             
         		license,             
         		license2,            
         		xboxLiveId,          
         		liveId,              
-        		fivemId,             
+        		fivemId);
+        final Details details = new Details("Identifiers", identifiers);
+        formLayout.add(discordId,           
+        		name,                
+        		discordIdentifier,   
+        		aliases, 
+        		details,
         		longTermSecondsLogged);
 
         editorDiv.add(formLayout);

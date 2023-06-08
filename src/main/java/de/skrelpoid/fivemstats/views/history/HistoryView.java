@@ -53,6 +53,7 @@ public class HistoryView extends Div {
 
     public HistoryView(final PlayerLogService playerLogService) {
         this.playerLogService = playerLogService;
+        playerLogService.calculateAllLoggedInTime();
         setSizeFull();
         addClassNames("history-view");
 
@@ -165,13 +166,9 @@ public class HistoryView extends Div {
                         "%" + lowerCaseFilter + "%");
                 final Predicate dcMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("discordIdentifier")),
                 		"%" +lowerCaseFilter + "%");
-                final Predicate alias1Match = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("alias1")),
+                final Predicate aliasesMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("aliases")),
                 		"%" +lowerCaseFilter + "%");
-                final Predicate alias2Match = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("alias2")),
-                		"%" +lowerCaseFilter + "%");
-                final Predicate alias3Match = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("alias3")),
-                		"%" +lowerCaseFilter + "%");
-                predicates.add(criteriaBuilder.or(nameMatch, dcMatch, alias1Match, alias2Match, alias3Match));
+                predicates.add(criteriaBuilder.or(nameMatch, dcMatch, aliasesMatch));
             }
             if (!phone.isEmpty()) {
                 final String databaseColumn = "phone";
@@ -239,9 +236,7 @@ public class HistoryView extends Div {
         grid.addColumn("player.name").setAutoWidth(true);
         grid.addColumn("player.discordId").setAutoWidth(true);
         grid.addColumn("player.discordIdentifier").setAutoWidth(true);
-        grid.addColumn("player.alias1").setAutoWidth(true);
-        grid.addColumn("player.alias2").setAutoWidth(true);
-        grid.addColumn("player.alias3").setAutoWidth(true);
+        grid.addColumn("player.aliases").setAutoWidth(true);
         grid.addColumn("logInTime").setAutoWidth(true);
         grid.addColumn("logOutTime").setAutoWidth(true);
 

@@ -46,12 +46,8 @@ public class Player implements Serializable {
 	private String name;
 	@Column(length = 100)
 	private String discordIdentifier;
-	@Column(length = 100)
-	private String alias1;
-	@Column(length = 100)
-	private String alias2;
-	@Column(length = 100)
-	private String alias3;
+	@Column(length = 500)
+	private String aliases;
 	@Column
 	private Long longTermSecondsLogged;
 	@OneToMany(mappedBy = "player", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -166,28 +162,12 @@ public class Player implements Serializable {
 		this.discordIdentifier = discordIdentifier;
 	}
 
-	public String getAlias1() {
-		return alias1;
+	public String getAliases() {
+		return aliases;
 	}
 
-	public void setAlias1(final String alias1) {
-		this.alias1 = alias1;
-	}
-
-	public String getAlias2() {
-		return alias2;
-	}
-
-	public void setAlias2(final String alias2) {
-		this.alias2 = alias2;
-	}
-
-	public String getAlias3() {
-		return alias3;
-	}
-
-	public void setAlias3(final String alias3) {
-		this.alias3 = alias3;
+	public void setAliases(final String aliases) {
+		this.aliases = aliases;
 	}
 
 	public Long getLongTermSecondsLogged() {
