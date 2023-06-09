@@ -5,13 +5,11 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.skrelpoid.fivemstats.data.Role;
-import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,9 +23,6 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    @Lob
-    @Column(length = 1000000)
-    private byte[] profilePicture;
 
     public String getUsername() {
         return username;
@@ -52,12 +47,6 @@ public class User extends AbstractEntity {
     }
     public void setRoles(final Set<Role> roles) {
         this.roles = roles;
-    }
-    public byte[] getProfilePicture() {
-        return profilePicture;
-    }
-    public void setProfilePicture(final byte[] profilePicture) {
-        this.profilePicture = profilePicture;
     }
     
     @Override

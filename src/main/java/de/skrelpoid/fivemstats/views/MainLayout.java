@@ -1,5 +1,9 @@
 package de.skrelpoid.fivemstats.views;
 
+import java.util.Optional;
+
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -14,7 +18,6 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
@@ -27,10 +30,6 @@ import de.skrelpoid.fivemstats.views.history.HistoryView;
 import de.skrelpoid.fivemstats.views.logs.LogsView;
 import de.skrelpoid.fivemstats.views.players.PlayersView;
 
-import java.io.ByteArrayInputStream;
-import java.util.Optional;
-import org.vaadin.lineawesome.LineAwesomeIcon;
-
 /**
  * The main view is a top-level placeholder for other views.
  */
@@ -38,10 +37,10 @@ public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
 
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
+    private final AuthenticatedUser authenticatedUser;
+    private final AccessAnnotationChecker accessChecker;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    public MainLayout(final AuthenticatedUser authenticatedUser, final AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
 
@@ -51,7 +50,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addHeaderContent() {
-        DrawerToggle toggle = new DrawerToggle();
+        final DrawerToggle toggle = new DrawerToggle();
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
 
         viewTitle = new H2();
@@ -61,11 +60,11 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        H1 appName = new H1("FiveMStats");
+        final H1 appName = new H1("FiveMStats");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-        Header header = new Header(appName);
+        final Header header = new Header(appName);
 
-        Scroller scroller = new Scroller(createNavigation());
+        final Scroller scroller = new Scroller(createNavigation());
 
         addToDrawer(header, scroller, createFooter());
     }
@@ -75,7 +74,7 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         // Starting with v24.1, AppNav will be replaced with the official
         // SideNav component.
-        AppNav nav = new AppNav();
+        final AppNav nav = new AppNav();
 
         if (accessChecker.hasAccess(DashboardView.class)) {
             nav.addItem(new AppNavItem("Dashboard", DashboardView.class, LineAwesomeIcon.HOME_SOLID.create()));
@@ -98,24 +97,21 @@ public class MainLayout extends AppLayout {
     }
 
     private Footer createFooter() {
-        Footer layout = new Footer();
+        final Footer layout = new Footer();
 
-        Optional<User> maybeUser = authenticatedUser.get();
+        final Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
+            final User user = maybeUser.get();
 
-            Avatar avatar = new Avatar(user.getName());
-            StreamResource resource = new StreamResource("profile-pic",
-                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-            avatar.setImageResource(resource);
+            final Avatar avatar = new Avatar(user.getName());
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
 
-            MenuBar userMenu = new MenuBar();
+            final MenuBar userMenu = new MenuBar();
             userMenu.setThemeName("tertiary-inline contrast");
 
-            MenuItem userName = userMenu.addItem("");
-            Div div = new Div();
+            final MenuItem userName = userMenu.addItem("");
+            final Div div = new Div();
             div.add(avatar);
             div.add(user.getName());
             div.add(new Icon("lumo", "dropdown"));
@@ -129,7 +125,7 @@ public class MainLayout extends AppLayout {
 
             layout.add(userMenu);
         } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
+            final Anchor loginLink = new Anchor("login", "Sign in");
             layout.add(loginLink);
         }
 
@@ -143,7 +139,7 @@ public class MainLayout extends AppLayout {
     }
 
     private String getCurrentPageTitle() {
-        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
+        final PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
         return title == null ? "" : title.value();
     }
 }
