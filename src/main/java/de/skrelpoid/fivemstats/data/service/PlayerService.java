@@ -1,5 +1,8 @@
 package de.skrelpoid.fivemstats.data.service;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -40,6 +43,10 @@ public class PlayerService {
 
     public int count() {
         return (int) repository.count();
+    }
+    
+    public Map<Long, Player> findAllAndGroupByID(){
+    	return repository.findAll().stream().collect(toMap(Player::getDiscordId, p -> p));
     }
 
 }

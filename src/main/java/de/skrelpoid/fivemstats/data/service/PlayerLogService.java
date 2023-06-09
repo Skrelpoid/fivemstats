@@ -1,7 +1,6 @@
 package de.skrelpoid.fivemstats.data.service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import de.skrelpoid.fivemstats.data.PlayerLogSeconds;
 import de.skrelpoid.fivemstats.data.entity.Player;
 import de.skrelpoid.fivemstats.data.entity.PlayerLog;
 
@@ -64,9 +64,8 @@ public class PlayerLogService {
     	return repository.findAllByLogOutTimeIsNotNull();
     }
     
-    public void calculateAllLoggedInTime() {
-    	final Object[][] result = repository.calculateAllLoggedInTime(LocalDateTime.now());
-    	logger.info(Arrays.deepToString(result));
+    public List<PlayerLogSeconds> calculateAllLoggedInTime() {
+    	return repository.calculateAllLoggedInTime(LocalDateTime.now());
     }
 
 }
