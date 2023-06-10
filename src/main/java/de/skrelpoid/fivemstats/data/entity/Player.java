@@ -3,6 +3,7 @@ package de.skrelpoid.fivemstats.data.entity;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,5 +211,16 @@ public class Player implements Serializable {
 	
 	public void setGroups(final List<Group> groups) {
 		this.groups = groups;
+	}
+	
+	@Override
+	public String toString() {
+		if (StringUtils.isNotBlank(aliases)) {
+			return aliases;
+		}
+		if (StringUtils.isNotBlank(discordIdentifier)) {
+			return discordIdentifier;
+		}
+		return name;
 	}
 }

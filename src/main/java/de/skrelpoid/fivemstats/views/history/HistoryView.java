@@ -41,11 +41,11 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import de.skrelpoid.fivemstats.data.entity.PlayerLog;
 import de.skrelpoid.fivemstats.data.service.PlayerLogService;
+import de.skrelpoid.fivemstats.data.service.PlayerService;
 import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -61,13 +61,13 @@ public class HistoryView extends Div {
 	private final Filters filters;
 	private final PlayerLogService playerLogService;
 
-	public HistoryView(final PlayerLogService playerLogService) {
+	public HistoryView(final PlayerLogService playerLogService, final PlayerService playerService) {
 		this.playerLogService = playerLogService;
 		playerLogService.calculateAllLoggedInTime();
 		setSizeFull();
 		addClassNames("history-view");
 
-		filters = new Filters(this::refreshGrid);
+		filters = new Filters(this::refreshGrid, playerService);
 		final VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
 		layout.setSizeFull();
 		layout.setPadding(false);
@@ -107,9 +107,11 @@ public class HistoryView extends Div {
 		private final DatePicker endDate = new DatePicker();
 		private final MultiSelectComboBox<String> occupations = new MultiSelectComboBox<>("Occupation");
 		private final CheckboxGroup<String> roles = new CheckboxGroup<>("Role");
+		
+		private final PlayerService playerService;
 
-		public Filters(final Runnable onSearch) {
-
+		public Filters(final Runnable onSearch, final PlayerService playerService) {
+			this.playerService = playerService;
 			setWidthFull();
 			addClassName("filter-layout");
 			addClassNames(LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM,
@@ -183,33 +185,8 @@ public class HistoryView extends Div {
 			final List<Predicate> predicates = new ArrayList<>();
 
 			if (!search.isEmpty()) {
-				final String lowerCaseFilter = search.getValue().toLowerCase();
-				final Predicate nameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("player").get("name")),
-						"%" + lowerCaseFilter + "%");
-				final Predicate dcMatch = criteriaBuilder.like(
-						criteriaBuilder.lower(root.get("player").get("discordIdentifier")),
-						"%" + lowerCaseFilter + "%");
-				final Predicate aliasesMatch = criteriaBuilder
-						.like(criteriaBuilder.lower(root.get("player").get("aliases")), "%" + lowerCaseFilter + "%");
-				final Predicate steamMatch = criteriaBuilder
-						.equal(criteriaBuilder.lower(root.get("player").get("steamId")), lowerCaseFilter);
-				final Predicate licenseMatch = criteriaBuilder
-						.equal(criteriaBuilder.lower(root.get("player").get("license")), lowerCaseFilter);
-				final Predicate license2Match = criteriaBuilder
-						.equal(criteriaBuilder.lower(root.get("player").get("license2")), lowerCaseFilter);
-				if (tryParseLong(lowerCaseFilter)) {
-					final Predicate discordMatch = criteriaBuilder.equal(root.get("player").get("discordId"),
-							lowerCaseFilter);
-					final Predicate xboxLiveMatch = criteriaBuilder.equal(root.get("player").get("xboxLiveId"),
-							lowerCaseFilter);
-					final Predicate liveMatch = criteriaBuilder.equal(root.get("player").get("liveId"), lowerCaseFilter);
-					final Predicate fivemMatch = criteriaBuilder.equal(root.get("player").get("fivemId"), lowerCaseFilter);
-					predicates.add(criteriaBuilder.or(nameMatch, dcMatch, aliasesMatch, discordMatch, steamMatch,
-							licenseMatch, license2Match, xboxLiveMatch, liveMatch, fivemMatch));
-				} else {
-					predicates.add(criteriaBuilder.or(nameMatch, dcMatch, aliasesMatch, steamMatch,
-							licenseMatch, license2Match));
-				}
+				final Predicate playerSearch = playerService.buildSearchPredicate(search.getValue().toLowerCase(), root, criteriaBuilder, "player");
+				predicates.add(playerSearch);
 			}
 			if (startDate.getValue() != null && endDate.getValue() != null) {
 				final LocalDateTime start = startDate.getValue().atStartOfDay();
@@ -241,15 +218,6 @@ public class HistoryView extends Div {
 			return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
 		}
 
-		private boolean tryParseLong(final String lowerCaseFilter) {
-			try {
-				Long.parseLong(lowerCaseFilter);
-				return true;
-			} catch (final NumberFormatException ex) {
-				return false;
-			}
-		}
-
 		protected void buildTimePeriodPredicates(final Root<PlayerLog> root, final CriteriaBuilder criteriaBuilder,
 				final List<Predicate> predicates, final LocalDateTime start, final LocalDateTime end) {
 			final LocalDateTime endToday = LocalDate.now().atTime(LocalTime.MAX);
@@ -259,24 +227,6 @@ public class HistoryView extends Div {
 					criteriaBuilder.literal(endToday));
 			final Predicate isNull = criteriaBuilder.isNull(root.get("logOutTime"));
 			predicates.add(criteriaBuilder.or(notNull, criteriaBuilder.and(isNull, ifNull)));
-		}
-
-		private String ignoreCharacters(final String characters, final String in) {
-			String result = in;
-			for (int i = 0; i < characters.length(); i++) {
-				result = result.replace("" + characters.charAt(i), "");
-			}
-			return result;
-		}
-
-		private Expression<String> ignoreCharacters(final String characters, final CriteriaBuilder criteriaBuilder,
-				final Expression<String> inExpression) {
-			Expression<String> expression = inExpression;
-			for (int i = 0; i < characters.length(); i++) {
-				expression = criteriaBuilder.function("replace", String.class, expression,
-						criteriaBuilder.literal(characters.charAt(i)), criteriaBuilder.literal(""));
-			}
-			return expression;
 		}
 
 	}

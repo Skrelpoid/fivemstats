@@ -26,6 +26,7 @@ import de.skrelpoid.fivemstats.components.appnav.AppNavItem;
 import de.skrelpoid.fivemstats.data.entity.User;
 import de.skrelpoid.fivemstats.security.AuthenticatedUser;
 import de.skrelpoid.fivemstats.views.dashboard.DashboardView;
+import de.skrelpoid.fivemstats.views.groups.GroupsView;
 import de.skrelpoid.fivemstats.views.history.HistoryView;
 import de.skrelpoid.fivemstats.views.logs.LogsView;
 import de.skrelpoid.fivemstats.views.players.PlayersView;
@@ -35,7 +36,9 @@ import de.skrelpoid.fivemstats.views.players.PlayersView;
  */
 public class MainLayout extends AppLayout {
 
-    private H2 viewTitle;
+	private static final long serialVersionUID = 1L;
+
+	private H2 viewTitle;
 
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
@@ -88,9 +91,11 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Players", PlayersView.class, LineAwesomeIcon.USER_FRIENDS_SOLID.create()));
 
         }
+        if (accessChecker.hasAccess(GroupsView.class)) {
+        	nav.addItem(new AppNavItem("Groups", GroupsView.class, LineAwesomeIcon.USERS_SOLID.create()));
+        }
         if (accessChecker.hasAccess(LogsView.class)) {
             nav.addItem(new AppNavItem("Logs", LogsView.class, LineAwesomeIcon.FILE.create()));
-
         }
 
         return nav;

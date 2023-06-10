@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
@@ -22,6 +23,7 @@ import jakarta.ws.rs.client.WebTarget;
  */
 @SpringBootApplication
 @Theme(value = "fivemstats", variant = Lumo.DARK)
+@Push
 public class FiveMStatsApplication implements AppShellConfigurator {
 
 	private static final long serialVersionUID = 1L;
