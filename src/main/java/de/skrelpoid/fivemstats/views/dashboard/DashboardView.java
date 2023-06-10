@@ -18,6 +18,8 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.Scroller.ScrollDirection;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -52,6 +54,8 @@ public class DashboardView extends HorizontalLayout {
         final Map<Long, Player> players = playerService.findAllAndGroupByID();
         final List<PlayerLogSeconds> data = playerLogService.calculateAllLoggedInTime();
         
+        //TODO show players missing with 0
+        
         final ApexChartsBuilder builder = new ApexChartsBuilder();
         builder.withTooltip(TooltipBuilder.get().withTheme("dark").build());
         builder.withTheme(ThemeBuilder.get()
@@ -62,7 +66,7 @@ public class DashboardView extends HorizontalLayout {
         
         final Chart chart = new Chart();
         chart.setType(Type.BAR);
-        chart.setHeight("800");
+        chart.setHeight(String.valueOf(data.size() * 16));
         chart.setBackground("transparent");
         
         
@@ -78,8 +82,15 @@ public class DashboardView extends HorizontalLayout {
         builder.withXaxis(xaxis);
         builder.withDataLabels(DataLabelsBuilder.get().withEnabled(true).build());
         builder.withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(true).build()).build());
+        
+        final Scroller scroller = new Scroller();
+        scroller.setContent(builder.build());
+        scroller.setScrollDirection(ScrollDirection.VERTICAL);
+        scroller.setWidthFull();
+        scroller.setHeight("50%");
+        setHeightFull();
 
-        add(name, sayHello, builder.build());
+        add(name, sayHello, scroller);
     }
 
 }

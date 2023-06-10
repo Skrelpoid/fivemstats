@@ -1,6 +1,7 @@
 package de.skrelpoid.fivemstats.data.entity;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -31,7 +32,7 @@ public class PlayerLog implements Serializable {
 	
 	@Column
 	private LocalDateTime logOutTime;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -81,6 +82,12 @@ public class PlayerLog implements Serializable {
             return getId().equals(that.getId());
         }
         return super.equals(that);
+    }
+    
+    public long getDuration() {
+    	final LocalDateTime end = logOutTime != null ? logOutTime : LocalDateTime.now();
+    	final long minutes = Duration.between(logInTime, end).toMinutes();
+    	return Math.max(1, minutes);
     }
 
 }

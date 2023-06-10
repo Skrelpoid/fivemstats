@@ -15,8 +15,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "application_user")
 public class User extends AbstractEntity {
-
-    private String username;
+	
+	private static final long serialVersionUID = 1L;
+	
+	private String username;
     private String name;
     @JsonIgnore
     private String hashedPassword;

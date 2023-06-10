@@ -1,7 +1,6 @@
 package de.skrelpoid.fivemstats.data.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,6 +14,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -51,7 +51,9 @@ public class Player implements Serializable {
 	@Column
 	private Long longTermSecondsLogged;
 	@OneToMany(mappedBy = "player", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private final List<PlayerLog> playerLogs = new ArrayList<>();
+	private List<PlayerLog> playerLogs;
+	@ManyToMany(mappedBy = "players")
+	private List<Group> groups;
 
 	@JsonProperty("identifiers")
 	private void unpackNameFromNestedObject(final List<String> identifiers) {
@@ -194,11 +196,19 @@ public class Player implements Serializable {
     @Override
     public boolean equals(final Object obj) {
         if (!(obj instanceof final Player that)) {
-            return false; // null or not an AbstractEntity class
+            return false;
         }
         if (getId() != null) {
             return getId().equals(that.getId());
         }
         return super.equals(that);
     }
+
+	public List<Group> getGroups() {
+		return groups;
+	}
+	
+	public void setGroups(final List<Group> groups) {
+		this.groups = groups;
+	}
 }

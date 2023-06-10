@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,8 +16,6 @@ import de.skrelpoid.fivemstats.data.entity.PlayerLog;
 @Service
 public class PlayerLogService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PlayerLogService.class);
-
     private final PlayerLogRepository repository;
 
     public PlayerLogService(final PlayerLogRepository repository) {
@@ -66,6 +62,10 @@ public class PlayerLogService {
     
     public List<PlayerLogSeconds> calculateAllLoggedInTime() {
     	return repository.calculateAllLoggedInTime(LocalDateTime.now());
+    }
+    
+    public List<PlayerLogSeconds> calculateLoggedInTimeFromTo(final LocalDateTime from, final LocalDateTime to) {
+    	return repository.calculateLoggedInTimeFromTo(LocalDateTime.now(), from, to);
     }
 
 }
