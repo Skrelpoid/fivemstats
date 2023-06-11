@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.skrelpoid.fivemstats.data.entity.Player;
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -31,18 +32,21 @@ public class PlayerRestService {
 	}
 
 	public List<Player> queryPlayers() {
-		final Response response = webTarget.request(MediaType.APPLICATION_JSON).get(Response.class);
-		if (response.getStatus() == 200) {
-			final String rawJson = response.readEntity(String.class);
-			logger.info(rawJson);
-			try {
+		try {
+			final Response response = webTarget.request(MediaType.APPLICATION_JSON).get(Response.class);
+			if (response.getStatus() == 200) {
+				final String rawJson = response.readEntity(String.class);
+				logger.info(rawJson);
 				final Player[] players = objectMapper.readValue(rawJson, Player[].class);
 				return Arrays.asList(players);
-			} catch (final JsonProcessingException ex) {
-				logger.error("Error processing json", ex);
 			}
-		} 
-			// TODO handle error response
+		} catch (final JsonProcessingException ex) {
+			logger.error("Error processing json", ex);
+		} catch (final ProcessingException ex) {
+			logger.error("Processing error", ex);
+		} catch (final Exception ex) {
+			logger.error("Unknown error", ex);
+		}
 		return Collections.emptyList();
 	}
 }
