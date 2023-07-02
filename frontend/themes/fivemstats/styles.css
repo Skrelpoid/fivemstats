@@ -2,6 +2,7 @@
 @import url('./views/history-view.css');
 @import url('./views/players-view.css');
 @import url('./views/groups-view.css');
+@import url('./views/dashboard-view.css');
     [theme~="dark"] {
 
     }
