@@ -14,12 +14,17 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "license" }))
 public class Player implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Player.class);
@@ -28,10 +33,15 @@ public class Player implements Serializable {
 
 	@Id
 	@Column
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@Column
 	private Long discordId;
 
 	@Column(length = 40)
 	private String steamId;
+	
 	@Column(length = 40)
 	private String license;
 	@Column(length = 40)
@@ -89,8 +99,12 @@ public class Player implements Serializable {
 		}
 	}
 
+	public void setId(final Long id) {
+		this.id = id;
+	}
+	
 	public Long getId() {
-		return getDiscordId();
+		return id;
 	}
 
 	public Long getDiscordId() {

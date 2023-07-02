@@ -112,7 +112,10 @@ public class DashboardView extends HorizontalLayout {
 
 			final XAxis xaxis = new XAxis();
 			xaxis.setCategories(
-					data.stream().map(PlayerLogSeconds::getPlayerId).map(id -> players.get(id).getName()).toList());
+					data.stream()
+					.map(PlayerLogSeconds::getPlayerId)
+					.map(id -> players.get(id).getName())
+					.toList());
 
 			builder.withChart(chart);
 			builder.withSeries(new Series<>("Minutes Logged", data.stream().map(PlayerLogSeconds::getCumulatedSeconds)

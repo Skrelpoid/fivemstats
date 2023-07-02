@@ -29,6 +29,10 @@ public class PlayerLogService {
     public PlayerLog update(final PlayerLog entity) {
         return repository.save(entity);
     }
+    
+    public List<PlayerLog> updateAll(final Iterable<PlayerLog> entities) {
+    	return repository.saveAll(entities);
+    }
 
     public void delete(final Long id) {
         repository.deleteById(id);
@@ -46,6 +50,10 @@ public class PlayerLogService {
         return (int) repository.count();
     }
     
+    /**
+     * get all logs who have a log out time that is null, which means that the player belonging to the log is currently logged in
+     * @return a list of playerlogs that may be empty
+     */
     public List<PlayerLog> getActiveLogs() {
     	return repository.findAllByLogOutTimeIsNull();
     }

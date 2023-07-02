@@ -28,7 +28,7 @@ public class PlayerLog implements Serializable {
 	private Player player;
 	
 	@Column
-	private LocalDateTime logInTime; 
+	private LocalDateTime logInTime;
 	
 	@Column
 	private LocalDateTime logOutTime;

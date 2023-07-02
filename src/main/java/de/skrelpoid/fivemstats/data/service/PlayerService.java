@@ -31,6 +31,10 @@ public class PlayerService {
     public Optional<Player> get(final Long id) {
         return repository.findById(id);
     }
+    
+    public Optional<Player> get(final String license) {
+        return repository.findByLicense(license);
+    }
 
     public Player update(final Player entity) {
         return repository.save(entity);
@@ -63,7 +67,7 @@ public class PlayerService {
     }
     
     public Map<Long, Player> findAllAndGroupByID(){
-    	return repository.findAll().stream().collect(toMap(Player::getDiscordId, p -> p));
+    	return repository.findAll().stream().collect(toMap(Player::getId, p -> p));
     }
     
     public <X> Predicate buildSearchPredicate(final String searchValue, final Root<X> root,
