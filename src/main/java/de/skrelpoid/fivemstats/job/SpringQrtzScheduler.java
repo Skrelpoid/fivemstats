@@ -31,7 +31,7 @@ public class SpringQrtzScheduler {
     }
 
     @Bean
-    public SpringBeanJobFactory springBeanJobFactory(final ApplicationContext applicationContext) {
+    SpringBeanJobFactory springBeanJobFactory(final ApplicationContext applicationContext) {
         final AutoWiringSpringBeanJobFactory jobFactory = new AutoWiringSpringBeanJobFactory();
         logger.debug("Configuring Job factory");
 
@@ -40,7 +40,7 @@ public class SpringQrtzScheduler {
     }
 
     @Bean
-    public SchedulerFactoryBean scheduler(final Trigger[] triggers, final JobDetail[] jobs, final DataSource quartzDataSource, final SpringBeanJobFactory jobFactory) {
+    SchedulerFactoryBean scheduler(final Trigger[] triggers, final JobDetail[] jobs, final DataSource quartzDataSource, final SpringBeanJobFactory jobFactory) {
 
         final SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         logger.debug("Setting the Scheduler up");
@@ -53,7 +53,7 @@ public class SpringQrtzScheduler {
     }
 
     @Bean("queryJob")
-    public JobDetailFactoryBean queryJob() {
+    JobDetailFactoryBean queryJob() {
 
         final JobDetailFactoryBean jobDetailFactory = new JobDetailFactoryBean();
         jobDetailFactory.setJobClass(QueryPlayerDataJob.class);
@@ -63,7 +63,7 @@ public class SpringQrtzScheduler {
     }
 
     @Bean("queryTrigger")
-    public SimpleTriggerFactoryBean queryTrigger(final JobDetail queryJob) {
+    SimpleTriggerFactoryBean queryTrigger(final JobDetail queryJob) {
 
         final SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
         trigger.setJobDetail(queryJob);
@@ -75,9 +75,9 @@ public class SpringQrtzScheduler {
         trigger.setName("query_Trigger");
         return trigger;
     }
-    
+
     @Bean("longTermJob")
-    public JobDetailFactoryBean longTermJob() {
+    JobDetailFactoryBean longTermJob() {
 
         final JobDetailFactoryBean jobDetailFactory = new JobDetailFactoryBean();
         jobDetailFactory.setJobClass(CreateLongTermDataJob.class);
@@ -87,7 +87,7 @@ public class SpringQrtzScheduler {
     }
 
     @Bean("longTermTrigger")
-    public CronTriggerFactoryBean longTermTrigger(final JobDetail longTermJob) {
+    CronTriggerFactoryBean longTermTrigger(final JobDetail longTermJob) {
 
         final CronTriggerFactoryBean trigger = new CronTriggerFactoryBean();
         trigger.setJobDetail(longTermJob);

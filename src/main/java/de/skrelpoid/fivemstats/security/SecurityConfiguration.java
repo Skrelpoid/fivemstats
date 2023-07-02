@@ -18,7 +18,7 @@ import de.skrelpoid.fivemstats.views.login.LoginView;
 public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
