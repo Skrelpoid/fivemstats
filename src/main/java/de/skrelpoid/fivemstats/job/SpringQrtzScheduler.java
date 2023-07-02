@@ -24,6 +24,16 @@ public class SpringQrtzScheduler {
 	private static final int ONE_MINUTE = 60;
 
     private static final Logger logger = LoggerFactory.getLogger(SpringQrtzScheduler.class);
+    
+    public SpringQrtzScheduler(final CrashRecovery crashRecovery) {
+    	while(!crashRecovery.isFinished()) {
+    		try {
+				Thread.sleep(1000L);
+			} catch (final InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
+    	}
+    }
 
     @PostConstruct
     public void init() {
