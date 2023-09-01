@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "fivemstats.target.hostname",
+    "type": "java.lang.String",
+    "description": "hostname of the targeted fivem server"
+  },
+  {
+    "name": "fivemstats.target.port",
+    "type": "java.lang.Integer",
+    "description": "port of the targeted fivem server. Default is 30120"
+  }
+]}
