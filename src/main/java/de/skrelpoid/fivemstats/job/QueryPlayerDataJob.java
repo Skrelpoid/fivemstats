@@ -1,13 +1,13 @@
 package de.skrelpoid.fivemstats.job;
 
 import static java.util.stream.Collectors.toSet;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import de.skrelpoid.fivemstats.data.entity.Heartbeat;
 import de.skrelpoid.fivemstats.data.entity.Player;
 import de.skrelpoid.fivemstats.data.entity.PlayerLog;
@@ -48,7 +47,9 @@ public class QueryPlayerDataJob implements Job {
 		logger.info("Querying Player Data");
 		final LocalDateTime now = LocalDateTime.now();
 		saveHeartbeat(now);
+
 		final List<Player> players = playerRestService.queryPlayers();
+		cleanupDuplicatePlayers(players);
 		final List<Player> savedPlayers = new ArrayList<>();
 		loadOrSavePlayers(players, savedPlayers);
 		final List<PlayerLog> activeLogs = playerLogService.getActiveLogs();
@@ -69,6 +70,20 @@ public class QueryPlayerDataJob implements Job {
 		}
 	}
 
+	private void cleanupDuplicatePlayers(List<Player> players) {
+		Set<String> licenseNames = new HashSet<>(players.size());
+		for (Iterator<Player> iterator = players.iterator(); iterator.hasNext();) {
+			var player = iterator.next();
+			var currentLicenseName = player.getLicense() + "|" + player.getName();
+			if (licenseNames.contains(currentLicenseName)) {
+				logger.warn("Player with license {} and name {} is duplicate! Only considering them once",
+						player.getLicense(), player.getName());
+				iterator.remove();
+			}
+			licenseNames.add(currentLicenseName);
+		}
+	}
+
 	private void saveHeartbeat(final LocalDateTime now) {
 		final Heartbeat heartbeat = heartbeatRepository.findById(Heartbeat.STATIC_ID).orElse(new Heartbeat(now));
 		heartbeat.setLastActiveTime(now);
@@ -77,9 +92,8 @@ public class QueryPlayerDataJob implements Job {
 
 	protected void loadOrSavePlayers(final List<Player> players, final List<Player> savedPlayers) {
 		for (final Player player : players) {
-			final Optional<Player> existing = playerService.get(player.getLicense());
+			final Optional<Player> existing = playerService.findByLicenseAndName(player.getLicense(), player.getName());
 			if (existing.isPresent()) {
-				existing.get().setName(player.getName());
 				savedPlayers.add(playerService.update(existing.get()));
 			} else {
 				savedPlayers.add(playerService.update(player));
