@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.github.appreciated.apexcharts.ApexCharts;
 import com.github.appreciated.apexcharts.ApexChartsBuilder;
 import com.github.appreciated.apexcharts.config.Chart;
@@ -30,7 +28,6 @@ import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import de.skrelpoid.fivemstats.data.PlayerLogSeconds;
 import de.skrelpoid.fivemstats.data.entity.Player;
 import de.skrelpoid.fivemstats.data.service.PlayerLogService;
@@ -59,30 +56,31 @@ public class DashboardView extends HorizontalLayout {
 		this.playerLogService = playerLogService;
 		this.playerService = playerService;
 		setMargin(true);
+		setId("dashboardLayout");
 
 		setHeightFull();
 		progress = buildProgress();
-		
+
 		add(progress);
 	}
-	
+
 	private Div buildProgress() {
 		final Div container = new Div();
 		container.addClassName("progressContainer");
 		container.setSizeFull();
-		
+
 		final Label label = new Label("Loading Data, please stand by...");
 		container.add(label);
-		
+
 		final Div spinner = new Div();
 		spinner.addClassName("spinner");
-		
+
 		final Div cube1 = new Div();
 		cube1.addClassName("cube1");
-		
+
 		final Div cube2 = new Div();
 		cube2.addClassName("cube2");
-		
+
 		spinner.add(cube1, cube2);
 		container.add(label, spinner);
 		return container;
@@ -113,9 +111,9 @@ public class DashboardView extends HorizontalLayout {
 			final XAxis xaxis = new XAxis();
 			xaxis.setCategories(
 					data.stream()
-					.map(PlayerLogSeconds::getPlayerId)
-					.map(id -> players.get(id).getName())
-					.toList());
+							.map(PlayerLogSeconds::getPlayerId)
+							.map(id -> players.get(id).getName())
+							.toList());
 
 			builder.withChart(chart);
 			builder.withSeries(new Series<>("Minutes Logged", data.stream().map(PlayerLogSeconds::getCumulatedSeconds)
@@ -134,7 +132,7 @@ public class DashboardView extends HorizontalLayout {
 				scroller.setContent(charts);
 				scroller.setScrollDirection(ScrollDirection.VERTICAL);
 				scroller.setWidthFull();
-				scroller.setHeight("50%");
+				scroller.setHeight("90%");
 				remove(progress);
 				add(scroller);
 				final Element element = scroller.getElement();

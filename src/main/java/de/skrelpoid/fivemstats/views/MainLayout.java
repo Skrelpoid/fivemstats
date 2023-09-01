@@ -1,9 +1,7 @@
 package de.skrelpoid.fivemstats.views;
 
 import java.util.Optional;
-
 import org.vaadin.lineawesome.LineAwesomeIcon;
-
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -20,7 +18,6 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-
 import de.skrelpoid.fivemstats.components.appnav.AppNav;
 import de.skrelpoid.fivemstats.components.appnav.AppNavItem;
 import de.skrelpoid.fivemstats.data.entity.User;
@@ -40,111 +37,115 @@ public class MainLayout extends AppLayout {
 
 	private H2 viewTitle;
 
-    private final AuthenticatedUser authenticatedUser;
-    private final AccessAnnotationChecker accessChecker;
+	private final AuthenticatedUser authenticatedUser;
+	private final AccessAnnotationChecker accessChecker;
 
-    public MainLayout(final AuthenticatedUser authenticatedUser, final AccessAnnotationChecker accessChecker) {
-        this.authenticatedUser = authenticatedUser;
-        this.accessChecker = accessChecker;
+	public MainLayout(final AuthenticatedUser authenticatedUser, final AccessAnnotationChecker accessChecker) {
+		this.authenticatedUser = authenticatedUser;
+		this.accessChecker = accessChecker;
 
-        setPrimarySection(Section.DRAWER);
-        addDrawerContent();
-        addHeaderContent();
-    }
+		this.setId("appLayout");
+		this.getElement().setAttribute("no-scroll", "");
 
-    private void addHeaderContent() {
-        final DrawerToggle toggle = new DrawerToggle();
-        toggle.getElement().setAttribute("aria-label", "Menu toggle");
+		setPrimarySection(Section.DRAWER);
+		addDrawerContent();
+		addHeaderContent();
+	}
 
-        viewTitle = new H2();
-        viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+	private void addHeaderContent() {
+		final DrawerToggle toggle = new DrawerToggle();
+		toggle.getElement().setAttribute("aria-label", "Menu toggle");
 
-        addToNavbar(true, toggle, viewTitle);
-    }
+		viewTitle = new H2();
+		viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-    private void addDrawerContent() {
-        final H1 appName = new H1("FiveMStats");
-        appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-        final Header header = new Header(appName);
+		addToNavbar(true, toggle, viewTitle);
+	}
 
-        final Scroller scroller = new Scroller(createNavigation());
+	private void addDrawerContent() {
+		final H1 appName = new H1("FiveMStats");
+		appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+		final Header header = new Header(appName);
 
-        addToDrawer(header, scroller, createFooter());
-    }
+		final Scroller scroller = new Scroller(createNavigation());
+		scroller.setId("appLayoutScroller");
 
-    private AppNav createNavigation() {
-        // AppNav is not an official component.
-        // For documentation, visit https://github.com/vaadin/vcf-nav#readme
-        // Starting with v24.1, AppNav will be replaced with the official
-        // SideNav component.
-        final AppNav nav = new AppNav();
+		addToDrawer(header, scroller, createFooter());
+	}
 
-        if (accessChecker.hasAccess(DashboardView.class)) {
-            nav.addItem(new AppNavItem("Dashboard", DashboardView.class, LineAwesomeIcon.HOME_SOLID.create()));
+	private AppNav createNavigation() {
+		// AppNav is not an official component.
+		// For documentation, visit https://github.com/vaadin/vcf-nav#readme
+		// Starting with v24.1, AppNav will be replaced with the official
+		// SideNav component.
+		final AppNav nav = new AppNav();
 
-        }
-        if (accessChecker.hasAccess(HistoryView.class)) {
-            nav.addItem(new AppNavItem("History", HistoryView.class, LineAwesomeIcon.HISTORY_SOLID.create()));
+		if (accessChecker.hasAccess(DashboardView.class)) {
+			nav.addItem(new AppNavItem("Dashboard", DashboardView.class, LineAwesomeIcon.HOME_SOLID.create()));
 
-        }
-        if (accessChecker.hasAccess(PlayersView.class)) {
-            nav.addItem(new AppNavItem("Players", PlayersView.class, LineAwesomeIcon.USER_FRIENDS_SOLID.create()));
+		}
+		if (accessChecker.hasAccess(HistoryView.class)) {
+			nav.addItem(new AppNavItem("History", HistoryView.class, LineAwesomeIcon.HISTORY_SOLID.create()));
 
-        }
-        if (accessChecker.hasAccess(GroupsView.class)) {
-        	nav.addItem(new AppNavItem("Groups", GroupsView.class, LineAwesomeIcon.USERS_SOLID.create()));
-        }
-        if (accessChecker.hasAccess(LogsView.class)) {
-            nav.addItem(new AppNavItem("Logs", LogsView.class, LineAwesomeIcon.FILE.create()));
-        }
+		}
+		if (accessChecker.hasAccess(PlayersView.class)) {
+			nav.addItem(new AppNavItem("Players", PlayersView.class, LineAwesomeIcon.USER_FRIENDS_SOLID.create()));
 
-        return nav;
-    }
+		}
+		if (accessChecker.hasAccess(GroupsView.class)) {
+			nav.addItem(new AppNavItem("Groups", GroupsView.class, LineAwesomeIcon.USERS_SOLID.create()));
+		}
+		if (accessChecker.hasAccess(LogsView.class)) {
+			nav.addItem(new AppNavItem("Logs", LogsView.class, LineAwesomeIcon.FILE.create()));
+		}
 
-    private Footer createFooter() {
-        final Footer layout = new Footer();
+		return nav;
+	}
 
-        final Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            final User user = maybeUser.get();
+	private Footer createFooter() {
+		final Footer layout = new Footer();
 
-            final Avatar avatar = new Avatar(user.getName());
-            avatar.setThemeName("xsmall");
-            avatar.getElement().setAttribute("tabindex", "-1");
+		final Optional<User> maybeUser = authenticatedUser.get();
+		if (maybeUser.isPresent()) {
+			final User user = maybeUser.get();
 
-            final MenuBar userMenu = new MenuBar();
-            userMenu.setThemeName("tertiary-inline contrast");
+			final Avatar avatar = new Avatar(user.getName());
+			avatar.setThemeName("xsmall");
+			avatar.getElement().setAttribute("tabindex", "-1");
 
-            final MenuItem userName = userMenu.addItem("");
-            final Div div = new Div();
-            div.add(avatar);
-            div.add(user.getName());
-            div.add(new Icon("lumo", "dropdown"));
-            div.getElement().getStyle().set("display", "flex");
-            div.getElement().getStyle().set("align-items", "center");
-            div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
-            userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
-                authenticatedUser.logout();
-            });
+			final MenuBar userMenu = new MenuBar();
+			userMenu.setThemeName("tertiary-inline contrast");
 
-            layout.add(userMenu);
-        } else {
-            final Anchor loginLink = new Anchor("login", "Sign in");
-            layout.add(loginLink);
-        }
+			final MenuItem userName = userMenu.addItem("");
+			final Div div = new Div();
+			div.add(avatar);
+			div.add(user.getName());
+			div.add(new Icon("lumo", "dropdown"));
+			div.getElement().getStyle().set("display", "flex");
+			div.getElement().getStyle().set("align-items", "center");
+			div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
+			userName.add(div);
+			userName.getSubMenu().addItem("Sign out", e -> {
+				authenticatedUser.logout();
+			});
 
-        return layout;
-    }
+			layout.add(userMenu);
+		} else {
+			final Anchor loginLink = new Anchor("login", "Sign in");
+			layout.add(loginLink);
+		}
 
-    @Override
-    protected void afterNavigation() {
-        super.afterNavigation();
-        viewTitle.setText(getCurrentPageTitle());
-    }
+		return layout;
+	}
 
-    private String getCurrentPageTitle() {
-        final PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
-        return title == null ? "" : title.value();
-    }
+	@Override
+	protected void afterNavigation() {
+		super.afterNavigation();
+		viewTitle.setText(getCurrentPageTitle());
+	}
+
+	private String getCurrentPageTitle() {
+		final PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
+		return title == null ? "" : title.value();
+	}
 }
