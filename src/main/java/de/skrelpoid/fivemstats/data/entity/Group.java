@@ -1,7 +1,6 @@
 package de.skrelpoid.fivemstats.data.entity;
 
 import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +18,8 @@ public class Group extends AbstractEntity {
 	@Column(length = 100)
 	private String name;
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "player_in_group", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
+	@JoinTable(name = "player_in_group", joinColumns = @JoinColumn(name = "player_id"),
+			inverseJoinColumns = @JoinColumn(name = "group_id"))
 	private Set<Player> players;
 
 	public String getName() {
@@ -46,6 +46,11 @@ public class Group extends AbstractEntity {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 }

@@ -5,10 +5,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
@@ -38,14 +36,16 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-
+import de.skrelpoid.fivemstats.data.entity.Group;
 import de.skrelpoid.fivemstats.data.entity.PlayerLog;
+import de.skrelpoid.fivemstats.data.service.GroupService;
 import de.skrelpoid.fivemstats.data.service.PlayerLogService;
 import de.skrelpoid.fivemstats.data.service.PlayerService;
 import de.skrelpoid.fivemstats.views.MainLayout;
 import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -60,14 +60,16 @@ public class HistoryView extends Div {
 
 	private final Filters filters;
 	private final PlayerLogService playerLogService;
+	private final GroupService groupService;
 
-	public HistoryView(final PlayerLogService playerLogService, final PlayerService playerService) {
+	public HistoryView(final PlayerLogService playerLogService, final PlayerService playerService,
+			GroupService groupService) {
 		this.playerLogService = playerLogService;
-		playerLogService.calculateAllLoggedInTime();
+		this.groupService = groupService;
 		setSizeFull();
 		addClassNames("history-view");
 
-		filters = new Filters(this::refreshGrid, playerService);
+		filters = new Filters(this::refreshGrid, playerService, groupService);
 		final VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
 		layout.setSizeFull();
 		layout.setPadding(false);
@@ -105,20 +107,22 @@ public class HistoryView extends Div {
 		private final TextField search = new TextField("Search");
 		private final DatePicker startDate = new DatePicker("Period");
 		private final DatePicker endDate = new DatePicker();
-		private final MultiSelectComboBox<String> occupations = new MultiSelectComboBox<>("Occupation");
+		private final MultiSelectComboBox<Group> groups = new MultiSelectComboBox<>("Group");
 		private final CheckboxGroup<String> roles = new CheckboxGroup<>("Role");
-		
-		private final PlayerService playerService;
 
-		public Filters(final Runnable onSearch, final PlayerService playerService) {
+		private final PlayerService playerService;
+		private final GroupService groupService;
+
+		public Filters(final Runnable onSearch, final PlayerService playerService, final GroupService groupService) {
 			this.playerService = playerService;
+			this.groupService = groupService;
 			setWidthFull();
 			addClassName("filter-layout");
 			addClassNames(LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM,
 					LumoUtility.BoxSizing.BORDER);
 			search.setPlaceholder("Name or Aliases or Identifiers");
 
-			occupations.setItems("Insurance Clerk", "Mortarman", "Beer Coil Cleaner", "Scale Attendant");
+			groups.setItems(groupService.listAll());
 
 			roles.setItems("Worker", "Supervisor", "Manager", "External");
 			roles.addClassName("double-width");
@@ -130,7 +134,7 @@ public class HistoryView extends Div {
 				search.clear();
 				startDate.clear();
 				endDate.clear();
-				occupations.clear();
+				groups.clear();
 				roles.clear();
 				onSearch.run();
 			});
@@ -142,7 +146,7 @@ public class HistoryView extends Div {
 			actions.addClassName(LumoUtility.Gap.SMALL);
 			actions.addClassName("actions");
 
-			add(search, createDateRangeFilter(), occupations, roles, actions);
+			add(search, createDateRangeFilter(), groups, roles, actions);
 		}
 
 		private Component createDateRangeFilter() {
@@ -174,9 +178,10 @@ public class HistoryView extends Div {
 		}
 
 		private void setAriaLabel(final DatePicker datePicker, final String label) {
-			datePicker.getElement().executeJs("const input = this.inputElement;" //
-					+ "input.setAttribute('aria-label', $0);" //
-					+ "input.removeAttribute('aria-labelledby');", label);
+			datePicker.getElement().executeJs("""
+					const input = this.inputElement;\
+					input.setAttribute('aria-label', $0);\
+					input.removeAttribute('aria-labelledby');""", label);
 		}
 
 		@Override
@@ -185,7 +190,8 @@ public class HistoryView extends Div {
 			final List<Predicate> predicates = new ArrayList<>();
 
 			if (!search.isEmpty()) {
-				final Predicate playerSearch = playerService.buildSearchPredicate(search.getValue().toLowerCase(), root, criteriaBuilder, "player");
+				final Predicate playerSearch = playerService.buildSearchPredicate(search.getValue().toLowerCase(), root,
+						criteriaBuilder, "player");
 				predicates.add(playerSearch);
 			}
 			if (startDate.getValue() != null && endDate.getValue() != null) {
@@ -198,14 +204,14 @@ public class HistoryView extends Div {
 				final LocalDateTime end = value.atTime(LocalTime.MAX);
 				buildTimePeriodPredicates(root, criteriaBuilder, predicates, start, end);
 			}
-			if (!occupations.isEmpty()) {
-				final String databaseColumn = "occupation";
-				final List<Predicate> occupationPredicates = new ArrayList<>();
-				for (final String occupation : occupations.getValue()) {
-					occupationPredicates
-							.add(criteriaBuilder.equal(criteriaBuilder.literal(occupation), root.get(databaseColumn)));
+			if (!groups.isEmpty()) {
+				Join<Object, Object> join = root.join("player").join("groups");
+				final List<Predicate> groupPredicates = new ArrayList<>();
+				for (final Group group : groups.getValue()) {
+					groupPredicates
+							.add(criteriaBuilder.equal(criteriaBuilder.literal(group.getId()), join.get("id")));
 				}
-				predicates.add(criteriaBuilder.or(occupationPredicates.toArray(Predicate[]::new)));
+				predicates.add(criteriaBuilder.or(groupPredicates.toArray(Predicate[]::new)));
 			}
 			if (!roles.isEmpty()) {
 				final String databaseColumn = "role";
@@ -240,19 +246,19 @@ public class HistoryView extends Div {
 		final Column<PlayerLog> logInTime = grid.addColumn(new LocalDateTimeRenderer<>(
 				PlayerLog::getLogInTime,
 				"dd.MM.yyyy HH:mm:ss"))
-			.setAutoWidth(true)
-			.setHeader("Log In Time")
-			.setSortProperty("logInTime");
+				.setAutoWidth(true)
+				.setHeader("Log In Time")
+				.setSortProperty("logInTime");
 		final Column<PlayerLog> logOutTime = grid.addColumn(new LocalDateTimeRenderer<>(
 				PlayerLog::getLogOutTime,
 				"dd.MM.yyyy HH:mm:ss"))
-			.setAutoWidth(true)
-			.setHeader("Log Out Time")
-			.setSortProperty("logOutTime");
-		grid.addColumn(new NumberRenderer<>(PlayerLog::getDuration, "%s min"))		
-			.setAutoWidth(true)
-			.setHeader("Duration");
-		
+				.setAutoWidth(true)
+				.setHeader("Log Out Time")
+				.setSortProperty("logOutTime");
+		grid.addColumn(new NumberRenderer<>(PlayerLog::getDuration, "%s min"))
+				.setAutoWidth(true)
+				.setHeader("Duration");
+
 		grid.sort(List.of(new GridSortOrder<>(logInTime, SortDirection.DESCENDING)));
 		grid.setMultiSort(true, true);
 
