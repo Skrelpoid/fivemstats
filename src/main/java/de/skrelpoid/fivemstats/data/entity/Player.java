@@ -1,15 +1,13 @@
 package de.skrelpoid.fivemstats.data.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +22,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "license" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"license"}))
 public class Player implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Player.class);
@@ -35,13 +33,13 @@ public class Player implements Serializable {
 	@Column
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column
 	private Long discordId;
 
 	@Column(length = 40)
 	private String steamId;
-	
+
 	@Column(length = 40)
 	private String license;
 	@Column(length = 40)
@@ -61,40 +59,41 @@ public class Player implements Serializable {
 	private String aliases;
 	@Column
 	private Long longTermSecondsLogged;
-	@OneToMany(mappedBy = "player", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<PlayerLog> playerLogs;
+	@OneToMany(mappedBy = "player", orphanRemoval = true, cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY)
+	private List<PlayerLog> playerLogs = new ArrayList<>();
 	@ManyToMany(mappedBy = "players")
-	private List<Group> groups;
+	private List<Group> groups = new ArrayList<>();
 
 	@JsonProperty("identifiers")
 	private void unpackNameFromNestedObject(final List<String> identifiers) {
 		for (final String identifier : identifiers) {
 			final String[] keyValue = identifier.split(":");
 			switch (keyValue[0]) {
-			case "steam":
-				steamId = keyValue[1];
-				break;
-			case "license":
-				license = keyValue[1];
-				break;
-			case "license2":
-				license2 = keyValue[1];
-				break;
-			case "xbl":
-				xboxLiveId = Long.parseLong(keyValue[1]);
-				break;
-			case "live":
-				liveId = Long.parseLong(keyValue[1]);
-				break;
-			case "discord":
-				discordId = Long.parseLong(keyValue[1]);
-				break;
-			case "fivem":
-				fivemId = Long.parseLong(keyValue[1]);
-				break;
-			default:
-				logger.warn("Unknown identifier: {}", identifier);
-				break;
+				case "steam":
+					steamId = keyValue[1];
+					break;
+				case "license":
+					license = keyValue[1];
+					break;
+				case "license2":
+					license2 = keyValue[1];
+					break;
+				case "xbl":
+					xboxLiveId = Long.parseLong(keyValue[1]);
+					break;
+				case "live":
+					liveId = Long.parseLong(keyValue[1]);
+					break;
+				case "discord":
+					discordId = Long.parseLong(keyValue[1]);
+					break;
+				case "fivem":
+					fivemId = Long.parseLong(keyValue[1]);
+					break;
+				default:
+					logger.warn("Unknown identifier: {}", identifier);
+					break;
 			}
 		}
 	}
@@ -102,7 +101,7 @@ public class Player implements Serializable {
 	public void setId(final Long id) {
 		this.id = id;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -199,34 +198,34 @@ public class Player implements Serializable {
 		return playerLogs;
 
 	}
-	
-	@Override
-    public int hashCode() {
-        if (getId() != null) {
-            return getId().hashCode();
-        }
-        return super.hashCode();
-    }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (!(obj instanceof final Player that)) {
-            return false;
-        }
-        if (getId() != null) {
-            return getId().equals(that.getId());
-        }
-        return super.equals(that);
-    }
+	@Override
+	public int hashCode() {
+		if (getId() != null) {
+			return getId().hashCode();
+		}
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof final Player that)) {
+			return false;
+		}
+		if (getId() != null) {
+			return getId().equals(that.getId());
+		}
+		return super.equals(that);
+	}
 
 	public List<Group> getGroups() {
 		return groups;
 	}
-	
+
 	public void setGroups(final List<Group> groups) {
 		this.groups = groups;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (StringUtils.isNotBlank(aliases)) {
