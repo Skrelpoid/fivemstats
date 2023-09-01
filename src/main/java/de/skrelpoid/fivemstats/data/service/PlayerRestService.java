@@ -3,14 +3,11 @@ package de.skrelpoid.fivemstats.data.service;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.skrelpoid.fivemstats.data.entity.Player;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.WebTarget;
@@ -33,10 +30,11 @@ public class PlayerRestService {
 
 	public List<Player> queryPlayers() {
 		try {
-			final Response response = webTarget.request(MediaType.APPLICATION_JSON).get(Response.class);
+			final Response response =
+					webTarget.request(MediaType.APPLICATION_JSON).get(Response.class);
 			if (response.getStatus() == 200) {
 				final String rawJson = response.readEntity(String.class);
-				logger.info(rawJson);
+				logger.debug(rawJson);
 				final Player[] players = objectMapper.readValue(rawJson, Player[].class);
 				return Arrays.asList(players);
 			}
