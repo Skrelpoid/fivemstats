@@ -22,7 +22,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"license"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"license", "name"}))
 public class Player implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Player.class);
@@ -70,30 +70,30 @@ public class Player implements Serializable {
 		for (final String identifier : identifiers) {
 			final String[] keyValue = identifier.split(":");
 			switch (keyValue[0]) {
-				case "steam":
-					steamId = keyValue[1];
-					break;
-				case "license":
-					license = keyValue[1];
-					break;
-				case "license2":
-					license2 = keyValue[1];
-					break;
-				case "xbl":
-					xboxLiveId = Long.parseLong(keyValue[1]);
-					break;
-				case "live":
-					liveId = Long.parseLong(keyValue[1]);
-					break;
-				case "discord":
-					discordId = Long.parseLong(keyValue[1]);
-					break;
-				case "fivem":
-					fivemId = Long.parseLong(keyValue[1]);
-					break;
-				default:
-					logger.warn("Unknown identifier: {}", identifier);
-					break;
+			case "steam":
+				steamId = keyValue[1];
+				break;
+			case "license":
+				license = keyValue[1];
+				break;
+			case "license2":
+				license2 = keyValue[1];
+				break;
+			case "xbl":
+				xboxLiveId = Long.parseLong(keyValue[1]);
+				break;
+			case "live":
+				liveId = Long.parseLong(keyValue[1]);
+				break;
+			case "discord":
+				discordId = Long.parseLong(keyValue[1]);
+				break;
+			case "fivem":
+				fivemId = Long.parseLong(keyValue[1]);
+				break;
+			default:
+				logger.warn("Unknown identifier: {}", identifier);
+				break;
 			}
 		}
 	}
