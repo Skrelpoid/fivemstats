@@ -12,9 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import de.skrelpoid.fivemstats.data.entity.Player;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 @Service
 public class PlayerService {
@@ -67,53 +66,44 @@ public class PlayerService {
 		return repository.findAll().stream().collect(toMap(Player::getId, p -> p));
 	}
 
-	public <X> Predicate buildSearchPredicate(final String searchValue, final Root<X> root,
-			final CriteriaBuilder criteriaBuilder, final String subRoot) {
+	public <X> Predicate buildSearchPredicate(final String searchValue, final From<Player, Player> root,
+			final CriteriaBuilder criteriaBuilder) {
 		if (StringUtils.isBlank(searchValue)) {
 			return criteriaBuilder.and(); // true
 		}
 		final String lowerCaseFilter = searchValue;
 		final Predicate nameMatch =
-				criteriaBuilder.like(criteriaBuilder.lower(getPath(root, subRoot, "name")),
+				criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
 						"%" + lowerCaseFilter + "%");
 		final Predicate dcMatch = criteriaBuilder.like(
-				criteriaBuilder.lower(getPath(root, subRoot, "discordIdentifier")),
+				criteriaBuilder.lower(root.get("discordIdentifier")),
 				"%" + lowerCaseFilter + "%");
 		final Predicate aliasesMatch = criteriaBuilder
-				.like(criteriaBuilder.lower(getPath(root, subRoot, "aliases")),
+				.like(criteriaBuilder.lower(root.get("aliases")),
 						"%" + lowerCaseFilter + "%");
 		final Predicate steamMatch = criteriaBuilder
-				.equal(criteriaBuilder.lower(getPath(root, subRoot, "steamId")), lowerCaseFilter);
+				.equal(criteriaBuilder.lower(root.get("steamId")), lowerCaseFilter);
 		final Predicate licenseMatch = criteriaBuilder
-				.equal(criteriaBuilder.lower(getPath(root, subRoot, "license")), lowerCaseFilter);
+				.equal(criteriaBuilder.lower(root.get("license")), lowerCaseFilter);
 		final Predicate license2Match = criteriaBuilder
-				.equal(criteriaBuilder.lower(getPath(root, subRoot, "license2")), lowerCaseFilter);
+				.equal(criteriaBuilder.lower(root.get("license2")), lowerCaseFilter);
 		if (tryParseLong(lowerCaseFilter)) {
 			final Predicate discordMatch =
-					criteriaBuilder.equal(getPath(root, subRoot, "discordId"),
+					criteriaBuilder.equal(root.get("discordId"),
 							lowerCaseFilter);
 			final Predicate xboxLiveMatch =
-					criteriaBuilder.equal(getPath(root, subRoot, "xboxLiveId"),
+					criteriaBuilder.equal(root.get("xboxLiveId"),
 							lowerCaseFilter);
 			final Predicate liveMatch =
-					criteriaBuilder.equal(getPath(root, subRoot, "liveId"), lowerCaseFilter);
+					criteriaBuilder.equal(root.get("liveId"), lowerCaseFilter);
 			final Predicate fivemMatch =
-					criteriaBuilder.equal(getPath(root, subRoot, "fivemId"), lowerCaseFilter);
+					criteriaBuilder.equal(root.get("fivemId"), lowerCaseFilter);
 			return criteriaBuilder.or(nameMatch, dcMatch, aliasesMatch, discordMatch, steamMatch,
 					licenseMatch, license2Match, xboxLiveMatch, liveMatch, fivemMatch);
 		}
 		return criteriaBuilder.or(nameMatch, dcMatch, aliasesMatch, steamMatch,
 				licenseMatch, license2Match);
 	}
-
-	private <X, Y> Path<Y> getPath(final Root<X> root, final String subRoot,
-			final String attributeName) {
-		if (StringUtils.isNotBlank(subRoot)) {
-			return root.get(subRoot).get(attributeName);
-		}
-		return root.get(attributeName);
-	}
-
 
 	private boolean tryParseLong(final String lowerCaseFilter) {
 		try {

@@ -1,21 +1,8 @@
 package de.skrelpoid.fivemstats.views.history;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
-import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasValue.ValueChangeListener;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -24,11 +11,8 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.renderer.NumberRenderer;
@@ -36,18 +20,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import de.skrelpoid.fivemstats.data.entity.Group;
 import de.skrelpoid.fivemstats.data.entity.PlayerLog;
 import de.skrelpoid.fivemstats.data.service.GroupService;
 import de.skrelpoid.fivemstats.data.service.PlayerLogService;
 import de.skrelpoid.fivemstats.data.service.PlayerService;
 import de.skrelpoid.fivemstats.views.MainLayout;
+import de.skrelpoid.fivemstats.views.components.Filters;
 import jakarta.annotation.security.PermitAll;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 @PageTitle("History")
 @Route(value = "history", layout = MainLayout.class)
@@ -58,7 +37,7 @@ public class HistoryView extends Div {
 
 	private Grid<PlayerLog> grid;
 
-	private final Filters filters;
+	private final Filters<PlayerLog> filters;
 	private final PlayerLogService playerLogService;
 	private final GroupService groupService;
 
@@ -69,7 +48,7 @@ public class HistoryView extends Div {
 		setSizeFull();
 		addClassNames("history-view");
 
-		filters = new Filters(this::refreshGrid, playerService, groupService);
+		filters = new Filters<>(this::refreshGrid, playerService, groupService, PlayerLog.class);
 		final VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
 		layout.setSizeFull();
 		layout.setPadding(false);
@@ -99,142 +78,6 @@ public class HistoryView extends Div {
 			}
 		});
 		return mobileFilters;
-	}
-
-	public static class Filters extends Div implements Specification<PlayerLog> {
-
-		private static final long serialVersionUID = 1L;
-		private final TextField search = new TextField("Search");
-		private final DatePicker startDate = new DatePicker("Period");
-		private final DatePicker endDate = new DatePicker();
-		private final MultiSelectComboBox<Group> groups = new MultiSelectComboBox<>("Group");
-		private final CheckboxGroup<String> roles = new CheckboxGroup<>("Role");
-
-		private final PlayerService playerService;
-		private final GroupService groupService;
-
-		public Filters(final Runnable onSearch, final PlayerService playerService, final GroupService groupService) {
-			this.playerService = playerService;
-			this.groupService = groupService;
-			setWidthFull();
-			addClassName("filter-layout");
-			addClassNames(LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM,
-					LumoUtility.BoxSizing.BORDER);
-			search.setPlaceholder("Name or Aliases or Identifiers");
-
-			groups.setItems(groupService.listAll());
-
-			roles.setItems("Worker", "Supervisor", "Manager", "External");
-			roles.addClassName("double-width");
-
-			// Action buttons
-			final Button resetBtn = new Button("Reset");
-			resetBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-			resetBtn.addClickListener(e -> {
-				search.clear();
-				startDate.clear();
-				endDate.clear();
-				groups.clear();
-				roles.clear();
-				onSearch.run();
-			});
-			final Button searchBtn = new Button("Search");
-			searchBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-			searchBtn.addClickListener(e -> onSearch.run());
-
-			final Div actions = new Div(resetBtn, searchBtn);
-			actions.addClassName(LumoUtility.Gap.SMALL);
-			actions.addClassName("actions");
-
-			add(search, createDateRangeFilter(), groups, roles, actions);
-		}
-
-		private Component createDateRangeFilter() {
-			startDate.setPlaceholder("From");
-			final ValueChangeListener<ComponentValueChangeEvent<DatePicker, LocalDate>> listener = event -> {
-				if (event.isFromClient()) {
-					final LocalDate start = startDate.getValue();
-					final LocalDate end = endDate.getValue();
-					if (start != null && end != null && start.isAfter(end)) {
-						startDate.setValue(end);
-						endDate.setValue(start);
-					}
-				}
-			};
-			startDate.addValueChangeListener(listener);
-
-			endDate.setPlaceholder("To");
-			endDate.addValueChangeListener(listener);
-
-			// For screen readers
-			setAriaLabel(startDate, "From date");
-			setAriaLabel(endDate, "To date");
-
-			final FlexLayout dateRangeComponent = new FlexLayout(startDate, new Text(" – "), endDate);
-			dateRangeComponent.setAlignItems(FlexComponent.Alignment.BASELINE);
-			dateRangeComponent.addClassName(LumoUtility.Gap.XSMALL);
-
-			return dateRangeComponent;
-		}
-
-		private void setAriaLabel(final DatePicker datePicker, final String label) {
-			datePicker.getElement().executeJs("""
-					const input = this.inputElement;\
-					input.setAttribute('aria-label', $0);\
-					input.removeAttribute('aria-labelledby');""", label);
-		}
-
-		@Override
-		public Predicate toPredicate(final Root<PlayerLog> root, final CriteriaQuery<?> query,
-				final CriteriaBuilder criteriaBuilder) {
-			final List<Predicate> predicates = new ArrayList<>();
-
-			if (!search.isEmpty()) {
-				final Predicate playerSearch = playerService.buildSearchPredicate(search.getValue().toLowerCase(), root,
-						criteriaBuilder, "player");
-				predicates.add(playerSearch);
-			}
-			if (startDate.getValue() != null && endDate.getValue() != null) {
-				final LocalDateTime start = startDate.getValue().atStartOfDay();
-				final LocalDateTime end = endDate.getValue().atTime(LocalTime.MAX);
-				buildTimePeriodPredicates(root, criteriaBuilder, predicates, start, end);
-			} else if (startDate.getValue() != null || endDate.getValue() != null) {
-				final LocalDate value = startDate.getValue() != null ? startDate.getValue() : endDate.getValue();
-				final LocalDateTime start = value.atStartOfDay();
-				final LocalDateTime end = value.atTime(LocalTime.MAX);
-				buildTimePeriodPredicates(root, criteriaBuilder, predicates, start, end);
-			}
-			if (!groups.isEmpty()) {
-				Join<Object, Object> join = root.join("player").join("groups");
-				final List<Predicate> groupPredicates = new ArrayList<>();
-				for (final Group group : groups.getValue()) {
-					groupPredicates
-							.add(criteriaBuilder.equal(criteriaBuilder.literal(group.getId()), join.get("id")));
-				}
-				predicates.add(criteriaBuilder.or(groupPredicates.toArray(Predicate[]::new)));
-			}
-			if (!roles.isEmpty()) {
-				final String databaseColumn = "role";
-				final List<Predicate> rolePredicates = new ArrayList<>();
-				for (final String role : roles.getValue()) {
-					rolePredicates.add(criteriaBuilder.equal(criteriaBuilder.literal(role), root.get(databaseColumn)));
-				}
-				predicates.add(criteriaBuilder.or(rolePredicates.toArray(Predicate[]::new)));
-			}
-			return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
-		}
-
-		protected void buildTimePeriodPredicates(final Root<PlayerLog> root, final CriteriaBuilder criteriaBuilder,
-				final List<Predicate> predicates, final LocalDateTime start, final LocalDateTime end) {
-			final LocalDateTime endToday = LocalDate.now().atTime(LocalTime.MAX);
-			predicates.add(criteriaBuilder.lessThan(root.get("logInTime"), criteriaBuilder.literal(end)));
-			final Predicate notNull = criteriaBuilder.lessThan(criteriaBuilder.literal(start), root.get("logOutTime"));
-			final Predicate ifNull = criteriaBuilder.lessThan(criteriaBuilder.literal(start),
-					criteriaBuilder.literal(endToday));
-			final Predicate isNull = criteriaBuilder.isNull(root.get("logOutTime"));
-			predicates.add(criteriaBuilder.or(notNull, criteriaBuilder.and(isNull, ifNull)));
-		}
-
 	}
 
 	private Component createGrid() {

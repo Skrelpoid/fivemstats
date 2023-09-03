@@ -96,7 +96,10 @@ public class DashboardView extends HorizontalLayout {
 			final Map<Long, Player> players = playerService.findAllAndGroupByID();
 			// TODO limit
 			final List<PlayerLogSeconds> data =
-					playerLogService.calculateAllLoggedInTime().stream().limit(250).toList();
+					playerLogService.calculateAllLoggedInTime()
+							.stream()
+							.limit(250)
+							.toList();
 
 			// TODO show players missing with 0
 
